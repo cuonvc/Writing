@@ -46,14 +46,12 @@ namespace Writing.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ModifiedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ModifiedDate")
@@ -80,14 +78,12 @@ namespace Writing.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ModifiedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ModifiedDate")
@@ -123,41 +119,37 @@ namespace Writing.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Downvote")
-                        .HasColumnType("int");
-
                     b.Property<string>("ModifiedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Thumbnail")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Upvote")
-                        .HasColumnType("int");
-
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.Property<int>("View")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VoteDown")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VoteUp")
                         .HasColumnType("int");
 
                     b.Property<bool>("isActive")
@@ -182,7 +174,6 @@ namespace Writing.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedDate")
@@ -192,7 +183,6 @@ namespace Writing.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ModifiedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ModifiedDate")
@@ -224,20 +214,18 @@ namespace Writing.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("FollowerIdId")
+                    b.Property<int?>("FollowerId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("FollowingIdId")
+                    b.Property<int?>("FollowingId")
                         .HasColumnType("int");
 
                     b.Property<string>("ModifiedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ModifiedDate")
@@ -248,9 +236,9 @@ namespace Writing.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FollowerIdId");
+                    b.HasIndex("FollowerId");
 
-                    b.HasIndex("FollowingIdId");
+                    b.HasIndex("FollowingId");
 
                     b.ToTable("Relationships_tbl");
                 });
@@ -264,19 +252,15 @@ namespace Writing.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("About")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AvatarPhoto")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CoverPhoto")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedDate")
@@ -293,15 +277,15 @@ namespace Writing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Gender")
-                        .HasColumnType("int");
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ModifiedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ModifiedDate")
@@ -311,8 +295,13 @@ namespace Writing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Role")
-                        .HasColumnType("int");
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("Salt")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<bool>("isActive")
                         .HasColumnType("bit");
@@ -364,17 +353,17 @@ namespace Writing.Migrations
 
             modelBuilder.Entity("Writing.Entities.Relationship", b =>
                 {
-                    b.HasOne("Writing.Entities.User", "FollowerId")
+                    b.HasOne("Writing.Entities.User", "Follower")
                         .WithMany()
-                        .HasForeignKey("FollowerIdId");
+                        .HasForeignKey("FollowerId");
 
-                    b.HasOne("Writing.Entities.User", "FollowingId")
+                    b.HasOne("Writing.Entities.User", "Following")
                         .WithMany()
-                        .HasForeignKey("FollowingIdId");
+                        .HasForeignKey("FollowingId");
 
-                    b.Navigation("FollowerId");
+                    b.Navigation("Follower");
 
-                    b.Navigation("FollowingId");
+                    b.Navigation("Following");
                 });
 
             modelBuilder.Entity("Writing.Entities.Post", b =>

@@ -1,7 +1,7 @@
 ﻿namespace Writing.Enumerates; 
 
 public enum Gender {
-    MALE,
-    FEMALE,
-    UNDEFINE
+    MALE = 1,
+    FEMALE = 2,
+    UNDEFINE = 0
 }

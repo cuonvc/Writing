@@ -20,8 +20,8 @@ namespace Writing.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     isActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -39,16 +39,17 @@ namespace Writing.Migrations
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    About = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Gender = table.Column<int>(type: "int", nullable: false),
-                    Role = table.Column<int>(type: "int", nullable: false),
+                    Salt = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    About = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AvatarPhoto = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CoverPhoto = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AvatarPhoto = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CoverPhoto = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     isActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -64,17 +65,17 @@ namespace Writing.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Thumbnail = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Upvote = table.Column<int>(type: "int", nullable: false),
-                    Downvote = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Thumbnail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    VoteUp = table.Column<int>(type: "int", nullable: false),
+                    VoteDown = table.Column<int>(type: "int", nullable: false),
                     View = table.Column<int>(type: "int", nullable: false),
                     pined = table.Column<bool>(type: "bit", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     isActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -98,8 +99,8 @@ namespace Writing.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     isActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -119,25 +120,25 @@ namespace Writing.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    FollowerIdId = table.Column<int>(type: "int", nullable: true),
-                    FollowingIdId = table.Column<int>(type: "int", nullable: true),
+                    FollowerId = table.Column<int>(type: "int", nullable: true),
+                    FollowingId = table.Column<int>(type: "int", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     isActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Relationships_tbl", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Relationships_tbl_Users_tbl_FollowerIdId",
-                        column: x => x.FollowerIdId,
+                        name: "FK_Relationships_tbl_Users_tbl_FollowerId",
+                        column: x => x.FollowerId,
                         principalTable: "Users_tbl",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Relationships_tbl_Users_tbl_FollowingIdId",
-                        column: x => x.FollowingIdId,
+                        name: "FK_Relationships_tbl_Users_tbl_FollowingId",
+                        column: x => x.FollowingId,
                         principalTable: "Users_tbl",
                         principalColumn: "Id");
                 });
@@ -176,8 +177,8 @@ namespace Writing.Migrations
                     PostId = table.Column<int>(type: "int", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     isActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -211,14 +212,14 @@ namespace Writing.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Relationships_tbl_FollowerIdId",
+                name: "IX_Relationships_tbl_FollowerId",
                 table: "Relationships_tbl",
-                column: "FollowerIdId");
+                column: "FollowerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Relationships_tbl_FollowingIdId",
+                name: "IX_Relationships_tbl_FollowingId",
                 table: "Relationships_tbl",
-                column: "FollowingIdId");
+                column: "FollowingId");
         }
 
         /// <inheritdoc />

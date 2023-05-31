@@ -6,6 +6,9 @@ namespace Writing.Entities;
 public class RefreshToken : BaseEntity {
     
     public string Token { get; set; }
+    
     public DateTime ExpireDate { get; set; }
+    
     public User User { get; set; }
+    
 }

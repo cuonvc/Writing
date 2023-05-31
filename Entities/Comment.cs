@@ -6,4 +6,5 @@ namespace Writing.Entities;
 public class Comment : BaseEntity {
 
     public string content { get; set; }
+    
 }

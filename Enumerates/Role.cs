@@ -1,6 +1,6 @@
 ﻿namespace Writing.Enumerates; 
 
 public enum Role {
-    USER_ROLE,
-    ADMIN_ROLE
+    USER_ROLE = 0,
+    ADMIN_ROLE = 1
 }
