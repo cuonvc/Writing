@@ -37,7 +37,7 @@ namespace Writing.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Salt = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     About = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -220,6 +220,12 @@ namespace Writing.Migrations
                 name: "IX_Relationships_tbl_FollowingId",
                 table: "Relationships_tbl",
                 column: "FollowingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_tbl_Email",
+                table: "Users_tbl",
+                column: "Email",
+                unique: true);
         }
 
         /// <inheritdoc />

@@ -1,11 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.EntityFrameworkCore;
 using Writing.Enumerates;
 
 namespace Writing.Entities; 
 
 [Table("Users_tbl")]
+[Index("Email", IsUnique = true)]
 public class User : BaseEntity {
 
     public string FirstName { get; set; }

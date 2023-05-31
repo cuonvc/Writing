@@ -6,4 +6,8 @@ namespace Writing.Services;
 
 public interface AuthService {
     ResponseObject<UserDTO> register(RegisterRequest request);
+
+    ResponseObject<ResponseTokenObject> login(LoginRequest request);
+
+    ResponseObject<ResponseTokenObject> renewAccessToken(TokenObjectRequest request);
 }

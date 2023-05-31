@@ -18,7 +18,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<UserConverter>();
 builder.Services.AddSingleton<SecurityConfiguration>();
 builder.Services.AddSingleton<ResponseObject<UserDTO>>();
+builder.Services.AddSingleton<ResponseObject<ResponseTokenObject>>();
 builder.Services.AddTransient<AuthService, AuthServiceImpl>();
+builder.Services.AddTransient<RefreshTokenService, RefreshTokenImpl>();
 builder.Services.AddDbContext<DataContext>(options => {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection"));
 });

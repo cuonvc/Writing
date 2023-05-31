@@ -19,4 +19,5 @@ public class DataContext : DbContext {
     public DbSet<Category> Categories { get; set; }
     public DbSet<Relationship> Relationships { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    
 }

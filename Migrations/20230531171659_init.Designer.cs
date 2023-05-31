@@ -12,7 +12,7 @@ using Writing.Repositories;
 namespace Writing.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230531162408_init")]
+    [Migration("20230531171659_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -274,7 +274,7 @@ namespace Writing.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -310,6 +310,9 @@ namespace Writing.Migrations
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("Users_tbl");
                 });
