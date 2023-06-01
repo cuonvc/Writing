@@ -13,4 +13,6 @@ public interface UserService {
     ResponseObject<UserDTO> update(UserUpdateRequest request, int id);
 
     ResponseObject<UserDTO> updateAvatar(IFormFile file, int id);
+
+    ResponseObject<UserDTO> updateCover(IFormFile file, int id);
 }

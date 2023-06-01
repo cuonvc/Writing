@@ -67,28 +67,46 @@ public class UserServiceImpl : UserService {
         }
 
         if (isImageFile(file)) {
-            string newFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-            string currentDir = Directory.GetCurrentDirectory();
-            string relativePath = Path.Combine("\\resource\\images\\avatar", id.ToString(), newFileName);
-            Directory.CreateDirectory(Path.Combine("resource/images/avatar", id.ToString()));  //create directory if not existed
-            string absolutePath = Path.ChangeExtension(currentDir + relativePath, "png");
-            foreach (var f in Directory.GetFiles(currentDir + "/resource/images/avatar/" + id.ToString())) {
-                File.Delete(f);
-            }
-            using (var fileStream = new FileStream(absolutePath, FileMode.Create)) {
-                file.CopyTo(fileStream);
-            }
-
-            string imagePath = relativePath.Substring(1).Replace("\\", "%2F");  //%2F == /
             User user = dataContext.Users.Where(user => user.Id.Equals(id)).FirstOrDefault();
-            user.AvatarPhoto = imagePath;
+            user.AvatarPhoto = handle(file, id, "avatar");
             dataContext.SaveChanges();
             
-
             return responseObject.responseSuccess("Update avatar successfully", userConverter.entityToDto(user));
         }
-
+        
         return responseObject.responseError(StatusCodes.Status400BadRequest, "Error unrecognized", null);
+    }
+
+    public ResponseObject<UserDTO> updateCover(IFormFile file, int id) {
+        if (file == null) {
+            return responseObject.responseError(StatusCodes.Status400BadRequest,
+                "File is not exists", null);
+        }
+
+        if (isImageFile(file)) {
+            User user = dataContext.Users.Where(user => user.Id.Equals(id)).FirstOrDefault();
+            user.CoverPhoto = handle(file, id, "cover");
+            dataContext.SaveChanges();
+            
+            return responseObject.responseSuccess("Update cover successfully", userConverter.entityToDto(user));
+        }
+        return responseObject.responseError(StatusCodes.Status400BadRequest, "Error unrecognized", null);
+    }
+
+    private string handle(IFormFile file, int id, string dir) {
+        string newFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+        string currentDir = Directory.GetCurrentDirectory();
+        string relativePath = Path.Combine($"\\resource\\images\\{dir}", id.ToString(), newFileName);
+        Directory.CreateDirectory(Path.Combine($"resource/images/{dir}", id.ToString()));  //create directory if not existed
+        string absolutePath = Path.ChangeExtension(currentDir + relativePath, "png");
+        foreach (var f in Directory.GetFiles(currentDir + $"/resource/images/{dir}/" + id.ToString())) {
+            File.Delete(f);
+        }
+        using (var fileStream = new FileStream(absolutePath, FileMode.Create)) {
+            file.CopyTo(fileStream);
+        }
+
+        return relativePath.Substring(1).Replace("\\", "%2F");  //%2F == /
     }
 
     private bool isImageFile(IFormFile file) {

@@ -10,9 +10,11 @@ namespace Writing.Payloads.Converters;
 public class UserConverter {
 
     private readonly SecurityConfiguration securityConfiguration;
+    private readonly IHttpContextAccessor httpContextAccessor;
 
-    public UserConverter(SecurityConfiguration configuration) {
+    public UserConverter(SecurityConfiguration configuration, IHttpContextAccessor httpContextAccessor) {
         securityConfiguration = configuration;
+        this.httpContextAccessor = httpContextAccessor;
     }
 
     public User regRequestToEntity(RegisterRequest request) {
@@ -27,6 +29,8 @@ public class UserConverter {
     }
 
     public UserDTO entityToDto(User entity) {
+        HttpContext context = httpContextAccessor.HttpContext;
+        string baseUrl = $"{context.Request.Scheme}://{context.Request.Host}/image/";
         return new UserDTO {
             Id = entity.Id,
             FirstName = entity.FirstName,
@@ -35,8 +39,8 @@ public class UserConverter {
             About = entity.About,
             Gender = entity.Gender,
             DateOfBirth = entity.DateOfBirth,
-            AvatarPhoto = entity.AvatarPhoto,
-            CoverPhoto = entity.CoverPhoto
+            AvatarPhoto = baseUrl + entity.AvatarPhoto, //http://localhost:8080/...
+            CoverPhoto = baseUrl + entity.CoverPhoto
         };
     }
 
