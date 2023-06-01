@@ -11,6 +11,7 @@ using Writing.Payloads.Responses;
 using Writing.Repositories;
 using Writing.Services;
 using Writing.Services.Impl;
+using Action = Writing.Enumerates.Action;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,11 +25,13 @@ builder.Services.AddSingleton<UserConverter>();
 builder.Services.AddSingleton<SecurityConfiguration>();
 builder.Services.AddSingleton<ResponseObject<UserDTO>>();
 builder.Services.AddSingleton<ResponseObject<List<UserDTO>>>();
+builder.Services.AddSingleton<ResponseObject<Action>>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<ResponseObject<ResponseTokenObject>>();
 builder.Services.AddTransient<AuthService, AuthServiceImpl>();
 builder.Services.AddTransient<RefreshTokenService, RefreshTokenImpl>();
 builder.Services.AddTransient<UserService, UserServiceImpl>();
+builder.Services.AddTransient<RelationshipService, RelationshipServiceImpl>();
 builder.Services.AddDbContext<DataContext>(options => {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection"));
 });
