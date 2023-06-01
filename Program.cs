@@ -27,6 +27,7 @@ builder.Services.AddSingleton<CategoryConverter>();
 builder.Services.AddSingleton<SecurityConfiguration>();
 builder.Services.AddSingleton<ResponseObject<UserDTO>>();
 builder.Services.AddSingleton<ResponseObject<List<UserDTO>>>();
+builder.Services.AddSingleton<ResponseObject<List<CategoryDTO>>>();
 builder.Services.AddSingleton<ResponseObject<Action>>();
 builder.Services.AddSingleton<ResponseObject<PostDTO>>();
 builder.Services.AddSingleton<ResponseObject<CategoryDTO>>();

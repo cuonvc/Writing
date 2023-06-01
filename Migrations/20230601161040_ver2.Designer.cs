@@ -12,7 +12,7 @@ using Writing.Repositories;
 namespace Writing.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230601142828_ver2")]
+    [Migration("20230601161040_ver2")]
     partial class ver2
     {
         /// <inheritdoc />
@@ -62,12 +62,15 @@ namespace Writing.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("isActive")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Categories_table");
                 });
