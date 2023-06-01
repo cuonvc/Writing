@@ -1,4 +1,9 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 using Writing.Configurations;
 using Writing.Payloads.Converters;
 using Writing.Payloads.DTOs;
@@ -18,11 +23,34 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<UserConverter>();
 builder.Services.AddSingleton<SecurityConfiguration>();
 builder.Services.AddSingleton<ResponseObject<UserDTO>>();
+builder.Services.AddSingleton<ResponseObject<List<UserDTO>>>();
 builder.Services.AddSingleton<ResponseObject<ResponseTokenObject>>();
 builder.Services.AddTransient<AuthService, AuthServiceImpl>();
 builder.Services.AddTransient<RefreshTokenService, RefreshTokenImpl>();
+builder.Services.AddTransient<UserService, UserServiceImpl>();
 builder.Services.AddDbContext<DataContext>(options => {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection"));
+});
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => {
+    options.TokenValidationParameters = new TokenValidationParameters {
+        ValidateIssuerSigningKey = true,
+        ValidateAudience = false,
+        ValidateIssuer = false,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+            builder.Configuration.GetSection("Jwt:Secret-key").Value!))
+    };
+});
+
+builder.Services.AddSwaggerGen(options => {
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme {
+        Description = "Jwt Authorization",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+    });
+    
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
 var app = builder.Build();

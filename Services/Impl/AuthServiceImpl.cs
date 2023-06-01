@@ -110,7 +110,8 @@ public class AuthServiceImpl : AuthService {
             new Claim("Email", user.Email),
             new Claim("FirstName", user.FirstName),
             new Claim("LastName", user.LastName),
-            new Claim("Gender", user.Gender)
+            new Claim("Gender", user.Gender),
+            new Claim("Role", user.Role)
         };
         
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
