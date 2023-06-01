@@ -1,4 +1,5 @@
-﻿using Writing.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using Writing.Entities;
 using Writing.Payloads.Converters;
 using Writing.Payloads.DTOs;
 using Writing.Payloads.Requests;
@@ -13,13 +14,16 @@ public class UserServiceImpl : UserService {
     private readonly ResponseObject<UserDTO> responseObject;
     private readonly ResponseObject<List<UserDTO>> responseList;
     private readonly UserConverter userConverter;
+    private readonly IHttpContextAccessor httpContextAccessor;
 
     public UserServiceImpl(DataContext dataContext, ResponseObject<UserDTO> responseObject,
-        ResponseObject<List<UserDTO>> responseList, UserConverter userConverter) {
+        ResponseObject<List<UserDTO>> responseList, UserConverter userConverter,
+        IHttpContextAccessor httpContextAccessor) {
         this.dataContext = dataContext;
         this.responseObject = responseObject;
         this.responseList = responseList;
         this.userConverter = userConverter;
+        this.httpContextAccessor = httpContextAccessor;
     }
 
     public ResponseObject<UserDTO> getById(int id) {
@@ -54,5 +58,45 @@ public class UserServiceImpl : UserService {
         userConverter.updateToEntity(user, request);
         dataContext.SaveChanges();
         return responseObject.responseSuccess("Updated successfully", userConverter.entityToDto(user));
+    }
+
+    public ResponseObject<UserDTO> updateAvatar(IFormFile file, int id) {
+        if (file == null) {
+            return responseObject.responseError(StatusCodes.Status400BadRequest,
+                "File is not exists", null);
+        }
+
+        if (isImageFile(file)) {
+            string newFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+            string currentDir = Directory.GetCurrentDirectory();
+            string relativePath = Path.Combine("\\resource\\images\\avatar", id.ToString(), newFileName);
+            Directory.CreateDirectory(Path.Combine("resource/images/avatar", id.ToString()));  //create directory if not existed
+            string absolutePath = Path.ChangeExtension(currentDir + relativePath, "png");
+            foreach (var f in Directory.GetFiles(currentDir + "/resource/images/avatar/" + id.ToString())) {
+                File.Delete(f);
+            }
+            using (var fileStream = new FileStream(absolutePath, FileMode.Create)) {
+                file.CopyTo(fileStream);
+            }
+
+            string imagePath = relativePath.Substring(1).Replace("\\", "%2F");  //%2F == /
+            User user = dataContext.Users.Where(user => user.Id.Equals(id)).FirstOrDefault();
+            user.AvatarPhoto = imagePath;
+            dataContext.SaveChanges();
+            
+
+            return responseObject.responseSuccess("Update avatar successfully", userConverter.entityToDto(user));
+        }
+
+        return responseObject.responseError(StatusCodes.Status400BadRequest, "Error unrecognized", null);
+    }
+
+    private bool isImageFile(IFormFile file) {
+        string[] allowImageTypes = { "image/jpeg", "image/png" };
+        if (!allowImageTypes.Contains(file.ContentType)) {
+            return false;
+        }
+
+        return true;
     }
 }

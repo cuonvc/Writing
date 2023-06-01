@@ -11,4 +11,6 @@ public interface UserService {
     ResponseObject<List<UserDTO>> getAll(int pageNo, int pageSize);
 
     ResponseObject<UserDTO> update(UserUpdateRequest request, int id);
+
+    ResponseObject<UserDTO> updateAvatar(IFormFile file, int id);
 }

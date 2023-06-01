@@ -56,4 +56,16 @@ public class UserController : Controller {
 
         return Ok(responseObject);
     }
+
+    [HttpPut("avatar")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public IActionResult updateAvatarPhoto(IFormFile file) {
+        int id = Convert.ToInt32(HttpContext.User.FindFirst("Id").Value);
+        ResponseObject<UserDTO> responseObject = userService.updateAvatar(file, id);
+        if (responseObject.Data == null) {
+            return BadRequest(responseObject);
+        }
+
+        return Ok(responseObject);
+    }
 }

@@ -24,6 +24,7 @@ builder.Services.AddSingleton<UserConverter>();
 builder.Services.AddSingleton<SecurityConfiguration>();
 builder.Services.AddSingleton<ResponseObject<UserDTO>>();
 builder.Services.AddSingleton<ResponseObject<List<UserDTO>>>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<ResponseObject<ResponseTokenObject>>();
 builder.Services.AddTransient<AuthService, AuthServiceImpl>();
 builder.Services.AddTransient<RefreshTokenService, RefreshTokenImpl>();
