@@ -40,7 +40,12 @@ public class UserConverter {
             Gender = entity.Gender,
             DateOfBirth = entity.DateOfBirth,
             AvatarPhoto = baseUrl + entity.AvatarPhoto, //http://localhost:8080/...
-            CoverPhoto = baseUrl + entity.CoverPhoto
+            CoverPhoto = baseUrl + entity.CoverPhoto,
+            CreatedDate = entity.CreatedDate,
+            CreatedBy = entity.CreatedBy,
+            ModifiedDate = entity.ModifiedDate,
+            ModifiedBy = entity.ModifiedBy,
+            isActive = entity.isActive
         };
     }
 

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Writing.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class ver2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -58,7 +58,7 @@ namespace Writing.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Posts_table",
+                name: "Posts_tbl",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -70,8 +70,8 @@ namespace Writing.Migrations
                     VoteUp = table.Column<int>(type: "int", nullable: false),
                     VoteDown = table.Column<int>(type: "int", nullable: false),
                     View = table.Column<int>(type: "int", nullable: false),
-                    pined = table.Column<bool>(type: "bit", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: true),
+                    Pined = table.Column<bool>(type: "bit", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -80,12 +80,13 @@ namespace Writing.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Posts_table", x => x.Id);
+                    table.PrimaryKey("PK_Posts_tbl", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Posts_table_Users_tbl_UserId",
+                        name: "FK_Posts_tbl_Users_tbl_UserId",
                         column: x => x.UserId,
                         principalTable: "Users_tbl",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -160,9 +161,9 @@ namespace Writing.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CategoryPost_Posts_table_PostsId",
+                        name: "FK_CategoryPost_Posts_tbl_PostsId",
                         column: x => x.PostsId,
-                        principalTable: "Posts_table",
+                        principalTable: "Posts_tbl",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -174,7 +175,8 @@ namespace Writing.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PostId = table.Column<int>(type: "int", nullable: true),
+                    PostId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -185,9 +187,15 @@ namespace Writing.Migrations
                 {
                     table.PrimaryKey("PK_Comments_tbl", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Comments_tbl_Posts_table_PostId",
+                        name: "FK_Comments_tbl_Posts_tbl_PostId",
                         column: x => x.PostId,
-                        principalTable: "Posts_table",
+                        principalTable: "Posts_tbl",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Comments_tbl_Users_tbl_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users_tbl",
                         principalColumn: "Id");
                 });
 
@@ -202,8 +210,13 @@ namespace Writing.Migrations
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Posts_table_UserId",
-                table: "Posts_table",
+                name: "IX_Comments_tbl_UserId",
+                table: "Comments_tbl",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Posts_tbl_UserId",
+                table: "Posts_tbl",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -247,7 +260,7 @@ namespace Writing.Migrations
                 name: "Categories_table");
 
             migrationBuilder.DropTable(
-                name: "Posts_table");
+                name: "Posts_tbl");
 
             migrationBuilder.DropTable(
                 name: "Users_tbl");

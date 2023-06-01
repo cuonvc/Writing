@@ -19,5 +19,11 @@ public class DataContext : DbContext {
     public DbSet<Category> Categories { get; set; }
     public DbSet<Relationship> Relationships { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
-    
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder) {
+        // modelBuilder.Entity<Comment>()
+        //     .HasOne<User>(s => s.User)
+        //     .WithMany(c => c.Comments)
+        //     .HasForeignKey(u => u.)
+    }
 }

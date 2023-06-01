@@ -12,8 +12,8 @@ using Writing.Repositories;
 namespace Writing.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230531171659_init")]
-    partial class init
+    [Migration("20230601142828_ver2")]
+    partial class ver2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -92,7 +92,10 @@ namespace Writing.Migrations
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("PostId")
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.Property<string>("content")
@@ -105,6 +108,8 @@ namespace Writing.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Comments_tbl");
                 });
@@ -136,6 +141,9 @@ namespace Writing.Migrations
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("Pined")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Thumbnail")
                         .HasColumnType("nvarchar(max)");
 
@@ -143,7 +151,7 @@ namespace Writing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.Property<int>("View")
@@ -158,14 +166,11 @@ namespace Writing.Migrations
                     b.Property<bool>("isActive")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("pined")
-                        .HasColumnType("bit");
-
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Posts_table");
+                    b.ToTable("Posts_tbl");
                 });
 
             modelBuilder.Entity("Writing.Entities.RefreshToken", b =>
@@ -334,16 +339,30 @@ namespace Writing.Migrations
 
             modelBuilder.Entity("Writing.Entities.Comment", b =>
                 {
-                    b.HasOne("Writing.Entities.Post", null)
+                    b.HasOne("Writing.Entities.Post", "Post")
                         .WithMany("Comments")
-                        .HasForeignKey("PostId");
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Writing.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Writing.Entities.Post", b =>
                 {
-                    b.HasOne("Writing.Entities.User", null)
+                    b.HasOne("Writing.Entities.User", "User")
                         .WithMany("Posts")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Writing.Entities.RefreshToken", b =>
