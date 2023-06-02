@@ -21,8 +21,9 @@ public class CategoryController : Controller {
     [Route("/api/category")]
     [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public IActionResult create(CategoryRequest request) {
-        if (!HttpContext.User.FindFirst("Role").Value.Equals("ADMIN_ROLE")) {
-            return new ObjectResult("Resource access by Admin") {
+        var role = HttpContext.User.FindFirst("Role").Value;
+        if (!role.Equals("ADMIN_ROLE") && !role.Equals("MOD_ROLE")) {
+            return new ObjectResult("Resource access by Admin and Moderators") {
                 StatusCode = 403
             };
         }
@@ -38,8 +39,9 @@ public class CategoryController : Controller {
     [Route("/api/category/{id}")]
     [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public IActionResult update(CategoryRequest request, int id) {
-        if (!HttpContext.User.FindFirst("Role").Value.Equals("ADMIN_ROLE")) {
-            return new ObjectResult("Resource access by Admin") {
+        var role = HttpContext.User.FindFirst("Role").Value;
+        if (!role.Equals("ADMIN_ROLE") && !role.Equals("MOD_ROLE")) {
+            return new ObjectResult("Resource access by Admin and Moderators") {
                 StatusCode = 403
             };
         }
@@ -74,8 +76,9 @@ public class CategoryController : Controller {
     [Route("/api/category/{id}")]
     [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public IActionResult hardDelete(int id) {
-        if (!HttpContext.User.FindFirst("Role").Value.Equals("ADMIN_ROLE")) {
-            return new ObjectResult("Resource access by Admin") {
+        var role = HttpContext.User.FindFirst("Role").Value;
+        if (!role.Equals("ADMIN_ROLE") && !role.Equals("MOD_ROLE")) {
+            return new ObjectResult("Resource access by Admin and Moderators") {
                 StatusCode = 403
             };
         }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Writing.Entities;
+using Writing.Enumerates;
 using Writing.Payloads.Converters;
 using Writing.Payloads.DTOs;
 using Writing.Payloads.Requests;
@@ -12,18 +13,20 @@ public class UserServiceImpl : UserService {
 
     private readonly DataContext dataContext;
     private readonly ResponseObject<UserDTO> responseObject;
+    private readonly ResponseObject<string> responseRole;
     private readonly ResponseObject<List<UserDTO>> responseList;
     private readonly UserConverter userConverter;
     private readonly IHttpContextAccessor httpContextAccessor;
 
     public UserServiceImpl(DataContext dataContext, ResponseObject<UserDTO> responseObject,
         ResponseObject<List<UserDTO>> responseList, UserConverter userConverter,
-        IHttpContextAccessor httpContextAccessor) {
+        IHttpContextAccessor httpContextAccessor, ResponseObject<string> responseRole) {
         this.dataContext = dataContext;
         this.responseObject = responseObject;
         this.responseList = responseList;
         this.userConverter = userConverter;
         this.httpContextAccessor = httpContextAccessor;
+        this.responseRole = responseRole;
     }
 
     public ResponseObject<UserDTO> getById(int id) {
@@ -116,5 +119,25 @@ public class UserServiceImpl : UserService {
         }
 
         return true;
+    }
+
+    public ResponseObject<string> assign(int adminId, int userId) {
+        User user = dataContext.Users.Where(user => user.Id.Equals(userId)).FirstOrDefault();
+        if (user == null) {
+            return responseRole.responseError(StatusCodes.Status404NotFound,
+                "User not found with id: " + userId, null);
+        }
+        
+        if (user.Id.Equals(adminId)) {
+            return responseRole.responseError(StatusCodes.Status400BadRequest,
+                "Admin can't assign yourself", null);
+        }
+
+        user.Role = user.Role.Equals("USER_ROLE")
+            ? Role.MOD_ROLE.ToString()
+            : Role.USER_ROLE.ToString();
+
+        dataContext.SaveChanges();
+        return responseRole.responseSuccess("Assign success", user.Role);
     }
 }

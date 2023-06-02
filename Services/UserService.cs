@@ -1,4 +1,5 @@
-﻿using Writing.Payloads.DTOs;
+﻿using Writing.Enumerates;
+using Writing.Payloads.DTOs;
 using Writing.Payloads.Requests;
 using Writing.Payloads.Responses;
 
@@ -15,4 +16,6 @@ public interface UserService {
     ResponseObject<UserDTO> updateAvatar(IFormFile file, int id);
 
     ResponseObject<UserDTO> updateCover(IFormFile file, int id);
+
+    ResponseObject<string> assign(int adminId, int userId);
 }
