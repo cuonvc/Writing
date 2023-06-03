@@ -9,6 +9,7 @@ public interface PostService {
 
     ResponseObject<PostDTO> createPost(int userId, PostRequest postRequest, List<string> categories);
     ResponseObject<PostDTO> DeletePost(int postId);
+    ResponseObject<PostDTO> getById(int id);
     ResponseObject<PostDTO> UpdatePost(int postId, PostRequest updatedPostRequest, List<string> updatedCategories);
     List<PostDTO> GetPostsByName(string? name, int pageNumber, int pageSize);
 }

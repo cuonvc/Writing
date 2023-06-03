@@ -23,6 +23,13 @@ public class PostConverter {
         };
     }
 
+    public void requestToEntity(PostRequest request, Post entity) {
+        entity.Title = request.Title;
+        entity.Content = request.Content;
+        entity.Description = request.Description;
+        entity.Thumbnail = request.Thumbnail;
+    }
+
     public PostDTO entityToDto(Post entity) {
         return new PostDTO {
             Id = entity.Id,

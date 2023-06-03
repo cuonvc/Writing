@@ -35,6 +35,21 @@ public class PostServiceImpl : PostService {
 
         return responseObject.responseSuccess("Success", postConverter.entityToDto(post));
     }
+
+    public ResponseObject<PostDTO> getById(int id) {
+        Post post = dataContext.Posts.Include(entity => entity.User)
+            .Include(entity => entity.Categories)
+            .Where(post => post.Id.Equals(id))
+            .FirstOrDefault();
+
+        if (post == null) {
+            return responseObject.responseError(StatusCodes.Status404NotFound,
+                "Post not found with id: " + id, null);
+        }
+
+        return responseObject.responseSuccess("Success", postConverter.entityToDto(post));
+    }
+
     public ResponseObject<PostDTO> DeletePost(int postId)
     {
         var postToDelete = dataContext.Posts.Include(x => x.User).Include(x => x.Categories).FirstOrDefault(x => x.Id == postId);
@@ -53,7 +68,7 @@ public class PostServiceImpl : PostService {
 
 
 
-    public ResponseObject<PostDTO> UpdatePost(int postId, PostRequest updatedPostRequest, List<string> updatedCategories)
+    public ResponseObject<PostDTO> UpdatePost(int postId, PostRequest request, List<string> categories)
     {
         var postToUpdate = dataContext.Posts
             .Include(x => x.User)
@@ -65,14 +80,9 @@ public class PostServiceImpl : PostService {
             return responseObject.responseError(StatusCodes.Status404NotFound, "Không tìm thấy bài đăng", null);
         }
 
-       
-        postToUpdate.Title = updatedPostRequest.Title;
-        postToUpdate.Content = updatedPostRequest.Content;
-        postToUpdate.Description = updatedPostRequest.Description;
-        postToUpdate.Thumbnail = updatedPostRequest.Thumbnail;
+        postConverter.requestToEntity(request, postToUpdate);
 
-       
-        var updatedCategoryList = updatedCategories
+        var updatedCategoryList = categories
             .Select(category => dataContext.Categories.FirstOrDefault(c => c.Name.Equals(category)))
             .ToList();
         postToUpdate.Categories.Clear();
