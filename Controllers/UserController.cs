@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Writing.Enumerates;
 using Writing.Payloads.DTOs;
@@ -106,4 +107,19 @@ public class UserController : Controller {
 
         return Ok(responseObject);
     }
+
+    [HttpPut]
+    [Route("/api/user/change_password")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public IActionResult changePassword(ChangePasswordRequest request) {
+        int id = Convert.ToInt32(HttpContext.User.FindFirst("Id").Value);
+        ResponseObject<UserDTO> responseObject = userService.changePassword(id, request.oldPassword, request.newPassword);
+
+        if (responseObject.Data == null) {
+            return BadRequest(responseObject);
+        }
+
+        return Ok(responseObject);
+    }
+    
 }

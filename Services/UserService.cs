@@ -18,4 +18,6 @@ public interface UserService {
     ResponseObject<UserDTO> updateCover(IFormFile file, int id);
 
     ResponseObject<string> assign(int adminId, int userId);
+
+    ResponseObject<UserDTO> changePassword(int userId, string oldPassword, string newPassword);
 }

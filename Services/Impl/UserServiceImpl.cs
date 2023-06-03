@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Security.Cryptography;
+using Microsoft.EntityFrameworkCore;
+using Writing.Configurations;
 using Writing.Entities;
 using Writing.Enumerates;
 using Writing.Payloads.Converters;
@@ -17,16 +19,19 @@ public class UserServiceImpl : UserService {
     private readonly ResponseObject<List<UserDTO>> responseList;
     private readonly UserConverter userConverter;
     private readonly IHttpContextAccessor httpContextAccessor;
+    private readonly SecurityConfiguration securityConfiguration;
 
     public UserServiceImpl(DataContext dataContext, ResponseObject<UserDTO> responseObject,
         ResponseObject<List<UserDTO>> responseList, UserConverter userConverter,
-        IHttpContextAccessor httpContextAccessor, ResponseObject<string> responseRole) {
+        IHttpContextAccessor httpContextAccessor, ResponseObject<string> responseRole,
+        SecurityConfiguration securityConfiguration) {
         this.dataContext = dataContext;
         this.responseObject = responseObject;
         this.responseList = responseList;
         this.userConverter = userConverter;
         this.httpContextAccessor = httpContextAccessor;
         this.responseRole = responseRole;
+        this.securityConfiguration = securityConfiguration;
     }
 
     public ResponseObject<UserDTO> getById(int id) {
@@ -139,5 +144,21 @@ public class UserServiceImpl : UserService {
 
         dataContext.SaveChanges();
         return responseRole.responseSuccess("Assign success", user.Role);
+    }
+
+    public ResponseObject<UserDTO> changePassword(int userId, string oldPassword, string newPassword) {
+        User user = dataContext.Users.Where(user => user.Id.Equals(userId)).FirstOrDefault();
+
+        string oldPasswordRequest = securityConfiguration.encodePassword(oldPassword, user.Salt);
+        if (!oldPasswordRequest.Equals(user.Password)) {
+            return responseObject.responseError(StatusCodes.Status400BadRequest,
+                "Incorrect password", null);
+        }
+
+        string newPasswordEncoded = securityConfiguration.encodePassword(newPassword, user.Salt);
+        user.Password = newPasswordEncoded;
+
+        dataContext.SaveChanges();
+        return responseObject.responseSuccess("Success", userConverter.entityToDto(user));
     }
 }
