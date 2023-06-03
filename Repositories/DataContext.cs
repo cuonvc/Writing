@@ -28,6 +28,7 @@ public class DataContext : DbContext {
     }
     // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     // {
-    //     optionsBuilder.UseSqlServer("server=MIELODIE\\SQLEXPRESS; database = project_C#; integrated security=sspi;encrypt=true;trustservercertificate=true;");
+    //     optionsBuilder.UseSqlServer("Config server để ở file appsettings.json nhé,
+    //                            đổi tên server ở line 51 file Program.cs");
     // }
 }
