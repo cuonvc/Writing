@@ -1,4 +1,5 @@
-﻿using Writing.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using Writing.Entities;
 using Writing.Payloads.Converters;
 using Writing.Payloads.DTOs;
 using Writing.Payloads.Requests;
@@ -33,5 +34,65 @@ public class PostServiceImpl : PostService {
         dataContext.SaveChanges();
 
         return responseObject.responseSuccess("Success", postConverter.entityToDto(post));
+    }
+    public ResponseObject<PostDTO> DeletePost(int postId)
+    {
+        var postToDelete = dataContext.Posts.Include(x => x.User).Include(x => x.Categories).FirstOrDefault(x => x.Id == postId);
+
+        if (postToDelete == null)
+        {
+            return responseObject.responseError(StatusCodes.Status404NotFound, "Không tìm thấy bài viết", null);
+        }
+
+        dataContext.Posts.Remove(postToDelete);
+        dataContext.SaveChanges();
+
+        var deletedPostDto = postConverter.entityToDto(postToDelete);
+        return responseObject.responseSuccess("Xóa bài đăng thành công", deletedPostDto);
+    }
+
+
+
+    public ResponseObject<PostDTO> UpdatePost(int postId, PostRequest updatedPostRequest, List<string> updatedCategories)
+    {
+        var postToUpdate = dataContext.Posts
+            .Include(x => x.User)
+            .Include(x => x.Categories)
+            .FirstOrDefault(x => x.Id == postId);
+
+        if (postToUpdate == null)
+        {
+            return responseObject.responseError(StatusCodes.Status404NotFound, "Không tìm thấy bài đăng", null);
+        }
+
+        // Cập nhật thuộc tính Post
+        postToUpdate.Title = updatedPostRequest.Title;
+        postToUpdate.Content = updatedPostRequest.Content;
+        postToUpdate.Description = updatedPostRequest.Description;
+        postToUpdate.Thumbnail = updatedPostRequest.Thumbnail;
+
+        // Cập nhật danh mục
+        var updatedCategoryList = updatedCategories
+            .Select(category => dataContext.Categories.FirstOrDefault(c => c.Name.Equals(category)))
+            .ToList();
+        postToUpdate.Categories.Clear();
+        postToUpdate.Categories.AddRange(updatedCategoryList);
+
+        dataContext.SaveChanges();
+
+        var updatedPostDto = postConverter.entityToDto(postToUpdate);
+        return responseObject.responseSuccess("Cập nhật thông tin bài đăng thành công", updatedPostDto);
+    }
+    public List<PostDTO> GetPostsByName(string? name, int pageNumber, int pageSize)
+    {
+        List<PostDTO> postDTOs = dataContext.Posts
+            .Include(x => x.User)
+            .Include(x => x.Categories)
+            .Where(x => x.Title.Trim().ToLower().Contains(name.ToLower().Trim()))
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(x => postConverter.entityToDto(x))
+            .ToList();
+        return postDTOs;
     }
 }

@@ -26,4 +26,8 @@ public class DataContext : DbContext {
         //     .WithMany(c => c.Comments)
         //     .HasForeignKey(u => u.)
     }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseSqlServer("server=MIELODIE\\SQLEXPRESS; database = project_C#; integrated security=sspi;encrypt=true;trustservercertificate=true;");
+    }
 }
