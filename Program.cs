@@ -37,6 +37,7 @@ builder.Services.AddSingleton<ResponseObject<Action>>();
 builder.Services.AddSingleton<ResponseObject<PostDTO>>();
 builder.Services.AddSingleton<ResponseObject<CategoryDTO>>();
 builder.Services.AddSingleton<ResponseObject<string>>();
+builder.Services.AddSingleton<ResponseData<ActionStatus>>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<ResponseObject<ResponseTokenObject>>();
 builder.Services.AddTransient<AuthService, AuthServiceImpl>();
@@ -45,6 +46,7 @@ builder.Services.AddTransient<UserService, UserServiceImpl>();
 builder.Services.AddTransient<RelationshipService, RelationshipServiceImpl>();
 builder.Services.AddTransient<PostService, PostServiceImpl>();
 builder.Services.AddTransient<CategoryService, CategoryServiceImpl>();
+builder.Services.AddTransient<CommentService, CommentServiceImpl>();
 builder.Services.AddDbContext<DataContext>(options => {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection"));
 });

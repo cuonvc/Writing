@@ -26,5 +26,26 @@ public class PostController : Controller {
         ResponseObject<PostDTO> responseObject = postService.createPost(id, postRequest, cateogries);
         return Ok(responseObject);
     }
+    [HttpPut("update-post")]
+    public IActionResult updatePost([FromQuery] int postId, PostRequest postRequest, [FromHeader] List<string> categories)
+    {
+        ResponseObject<PostDTO> responseObject = postService.UpdatePost(postId, postRequest, categories);
+        return Ok(responseObject);
+    }
+
+    [HttpDelete("delete-post")]
+    public IActionResult deletePost([FromQuery] int postId)
+    {
+        ResponseObject<PostDTO> responseObject = postService.DeletePost(postId);
+        return Ok(responseObject);
+    }
+
+    [HttpGet]
+    [Route("/api/posts/get-posts-by-name")]
+    public IActionResult getPost(string? name, int pageNumber, int pageSize)
+    {
+        List<PostDTO> postDTOs = postService.GetPostsByName(name, pageNumber, pageSize);
+        return Ok(postDTOs);
+    }
 
 }
