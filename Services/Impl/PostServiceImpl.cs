@@ -65,13 +65,13 @@ public class PostServiceImpl : PostService {
             return responseObject.responseError(StatusCodes.Status404NotFound, "Không tìm thấy bài đăng", null);
         }
 
-        // Cập nhật thuộc tính Post
+       
         postToUpdate.Title = updatedPostRequest.Title;
         postToUpdate.Content = updatedPostRequest.Content;
         postToUpdate.Description = updatedPostRequest.Description;
         postToUpdate.Thumbnail = updatedPostRequest.Thumbnail;
 
-        // Cập nhật danh mục
+       
         var updatedCategoryList = updatedCategories
             .Select(category => dataContext.Categories.FirstOrDefault(c => c.Name.Equals(category)))
             .ToList();

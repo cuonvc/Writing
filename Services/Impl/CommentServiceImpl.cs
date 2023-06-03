@@ -38,7 +38,6 @@ namespace Writing.Services.Impl
 
             Comment comment = new Comment();
 
-            // Kiểm tra sự tồn tại của userId trong bảng Users_tbl trước khi gán cho đối tượng Comment
             if (await dataContext.Users.AnyAsync(x => x.Id == userId))
             {
                 comment.User = await dataContext.Users.FindAsync(userId);
