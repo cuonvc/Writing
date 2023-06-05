@@ -26,4 +26,9 @@ public class DataContext : DbContext {
         //     .WithMany(c => c.Comments)
         //     .HasForeignKey(u => u.)
     }
+    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    // {
+    //     optionsBuilder.UseSqlServer("Config server để ở file appsettings.json nhé,
+    //                            đổi tên server ở line 51 file Program.cs");
+    // }
 }

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Writing.Configurations;
 using Writing.Entities;
 using Writing.Enumerates;
+using Writing.Handle;
 using Writing.Payloads.Converters;
 using Writing.Payloads.DTOs;
 using Writing.Payloads.Requests;
@@ -20,11 +21,12 @@ public class UserServiceImpl : UserService {
     private readonly UserConverter userConverter;
     private readonly IHttpContextAccessor httpContextAccessor;
     private readonly SecurityConfiguration securityConfiguration;
+    private readonly FileHandler fileHandler;
 
     public UserServiceImpl(DataContext dataContext, ResponseObject<UserDTO> responseObject,
         ResponseObject<List<UserDTO>> responseList, UserConverter userConverter,
         IHttpContextAccessor httpContextAccessor, ResponseObject<string> responseRole,
-        SecurityConfiguration securityConfiguration) {
+        SecurityConfiguration securityConfiguration, FileHandler fileHandler) {
         this.dataContext = dataContext;
         this.responseObject = responseObject;
         this.responseList = responseList;
@@ -32,6 +34,7 @@ public class UserServiceImpl : UserService {
         this.httpContextAccessor = httpContextAccessor;
         this.responseRole = responseRole;
         this.securityConfiguration = securityConfiguration;
+        this.fileHandler = fileHandler;
     }
 
     public ResponseObject<UserDTO> getById(int id) {
@@ -64,6 +67,7 @@ public class UserServiceImpl : UserService {
         }
 
         userConverter.updateToEntity(user, request);
+        user.ModifiedDate = DateTime.Now;
         dataContext.SaveChanges();
         return responseObject.responseSuccess("Updated successfully", userConverter.entityToDto(user));
     }
@@ -76,7 +80,8 @@ public class UserServiceImpl : UserService {
 
         if (isImageFile(file)) {
             User user = dataContext.Users.Where(user => user.Id.Equals(id)).FirstOrDefault();
-            user.AvatarPhoto = handle(file, id, "avatar");
+            user.AvatarPhoto = fileHandler.generatePath(file, id, "avatar");
+            user.ModifiedDate = DateTime.Now;
             dataContext.SaveChanges();
             
             return responseObject.responseSuccess("Update avatar successfully", userConverter.entityToDto(user));
@@ -93,7 +98,8 @@ public class UserServiceImpl : UserService {
 
         if (isImageFile(file)) {
             User user = dataContext.Users.Where(user => user.Id.Equals(id)).FirstOrDefault();
-            user.CoverPhoto = handle(file, id, "cover");
+            user.CoverPhoto = fileHandler.generatePath(file, id, "cover");
+            user.ModifiedDate = DateTime.Now;
             dataContext.SaveChanges();
             
             return responseObject.responseSuccess("Update cover successfully", userConverter.entityToDto(user));
@@ -101,21 +107,21 @@ public class UserServiceImpl : UserService {
         return responseObject.responseError(StatusCodes.Status400BadRequest, "Error unrecognized", null);
     }
 
-    private string handle(IFormFile file, int id, string dir) {
-        string newFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-        string currentDir = Directory.GetCurrentDirectory();
-        string relativePath = Path.Combine($"\\resource\\images\\{dir}", id.ToString(), newFileName);
-        Directory.CreateDirectory(Path.Combine($"resource/images/{dir}", id.ToString()));  //create directory if not existed
-        string absolutePath = Path.ChangeExtension(currentDir + relativePath, "png");
-        foreach (var f in Directory.GetFiles(currentDir + $"/resource/images/{dir}/" + id.ToString())) {
-            File.Delete(f);
-        }
-        using (var fileStream = new FileStream(absolutePath, FileMode.Create)) {
-            file.CopyTo(fileStream);
-        }
-
-        return relativePath.Substring(1).Replace("\\", "%2F");  //%2F == /
-    }
+    // private string handle(IFormFile file, int id, string dir) {
+    //     string newFileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+    //     string currentDir = Directory.GetCurrentDirectory();
+    //     string relativePath = Path.Combine($"\\resource\\images\\{dir}", id.ToString(), newFileName);
+    //     Directory.CreateDirectory(Path.Combine($"resource/images/{dir}", id.ToString()));  //create directory if not existed
+    //     string absolutePath = Path.ChangeExtension(currentDir + relativePath, "png");
+    //     foreach (var f in Directory.GetFiles(currentDir + $"/resource/images/{dir}/" + id.ToString())) {
+    //         File.Delete(f);
+    //     }
+    //     using (var fileStream = new FileStream(absolutePath, FileMode.Create)) {
+    //         file.CopyTo(fileStream);
+    //     }
+    //
+    //     return relativePath.Substring(1).Replace("\\", "%2F");  //%2F == /
+    // }
 
     private bool isImageFile(IFormFile file) {
         string[] allowImageTypes = { "image/jpeg", "image/png" };
@@ -157,6 +163,7 @@ public class UserServiceImpl : UserService {
 
         string newPasswordEncoded = securityConfiguration.encodePassword(newPassword, user.Salt);
         user.Password = newPasswordEncoded;
+        user.ModifiedDate = DateTime.Now;
 
         dataContext.SaveChanges();
         return responseObject.responseSuccess("Success", userConverter.entityToDto(user));

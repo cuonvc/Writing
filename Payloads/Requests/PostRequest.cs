@@ -7,7 +7,5 @@ public class PostRequest {
     public string Content { get; set; }
     
     public string Description { get; set; }
-    
-    public string Thumbnail { get; set; }
-    
+
 }
