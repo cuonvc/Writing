@@ -19,6 +19,7 @@ public class PostServiceImpl : PostService {
     private readonly ResponseObject<PostDTO> responseObject;
     private readonly ResponseObject<List<PostDTO>> responseList;
     private readonly ResponseObject<string> responseString;
+    private readonly ResponseObject<ActionStatus> responseActionStatus;
     private readonly FileHandler fileHandler;
     private readonly IDistributedCache distributedCache;
     private readonly IHttpContextAccessor httpContextAccessor;
@@ -26,7 +27,8 @@ public class PostServiceImpl : PostService {
     public PostServiceImpl(DataContext dataContext, PostConverter postConverter,
         ResponseObject<PostDTO> responseObject, IDistributedCache distributedCache,
         FileHandler fileHandler, ResponseObject<string> responseString,
-        IHttpContextAccessor httpContextAccessor, ResponseObject<List<PostDTO>> responseList) {
+        IHttpContextAccessor httpContextAccessor, ResponseObject<List<PostDTO>> responseList,
+        ResponseObject<ActionStatus> responseActionStatus) {
         this.dataContext = dataContext;
         this.postConverter = postConverter;
         this.responseObject = responseObject;
@@ -35,6 +37,7 @@ public class PostServiceImpl : PostService {
         this.responseString = responseString;
         this.httpContextAccessor = httpContextAccessor;
         this.responseList = responseList;
+        this.responseActionStatus = responseActionStatus;
     }
     
     public ResponseObject<PostDTO> submitPostCreate(int userId, PostRequest postRequest, List<string> categories) {
@@ -161,18 +164,14 @@ public class PostServiceImpl : PostService {
         return responseList.responseSuccess("Success", postDTOs);
     }
     
-    public async Task<ResponseData<ActionStatus>> PinPost(int postId)
+    public async Task<ResponseObject<ActionStatus>> PinPost(int postId)
     {
-        ResponseData<ActionStatus> result = new ResponseData<ActionStatus>();
-
         Post post = await dataContext.Posts.FindAsync(postId);
 
         if (post == null)
         {
-            result.Data = ActionStatus.NOTFOUND;
-            result.Status = ActionStatus.FAILED;
-            result.message = $"Bài viết có id: {postId} không tồn tại";
-            return result;
+            return responseActionStatus.responseError(StatusCodes.Status404NotFound,
+                $"Bài viết có id: {postId} không tồn tại", ActionStatus.NOTFOUND);
         }
 
         if (post.Pined == true) {
@@ -184,27 +183,19 @@ public class PostServiceImpl : PostService {
         dataContext.Posts.Update(post);
         await dataContext.SaveChangesAsync();
 
-        result.Data = ActionStatus.SUCCESSFULLY;
-        result.Status = ActionStatus.SUCCESSFULLY;
-        result.message = "Bài viết đã được ghim thành công!";
-
-        return result;
+        return responseActionStatus.responseSuccess("Success", ActionStatus.SUCCESSFULLY);
     }
-    public async Task<ResponseData<ActionStatus>> userLikePost(int userId, int postId, bool vote) {
-        ResponseData<ActionStatus> result = new ResponseData<ActionStatus>();
+    public async Task<ResponseObject<ActionStatus>> userLikePost(int userId, int postId, bool vote) {
         if (!await dataContext.Users.AnyAsync(x => x.Id == userId)) {
-            result.Data = ActionStatus.NOTFOUND;
-            result.Status = ActionStatus.FAILED;
-            result.message = $"Người dùng có id: {userId} không tồn tại";
-            return result;
+            responseActionStatus.Data = ActionStatus.NOTFOUND;
+            return responseActionStatus.responseError(StatusCodes.Status404NotFound,
+                $"Người dùng có id: {userId} không tồn tại", ActionStatus.NOTFOUND);
         }
         
         Post post = await dataContext.Posts.FindAsync(postId);
         if (post == null) {
-            result.Data = ActionStatus.NOTFOUND;
-            result.Status = ActionStatus.FAILED;
-            result.message = $"Bài viết có id: {userId} không tồn tại";
-            return result;
+            return responseActionStatus.responseError(StatusCodes.Status404NotFound,
+                $"Bài viết có id: {userId} không tồn tại", ActionStatus.NOTFOUND);
         }
 
         if (!vote) {
@@ -215,9 +206,6 @@ public class PostServiceImpl : PostService {
         
         dataContext.Posts.Update(post);
         await dataContext.SaveChangesAsync();
-        result.Data = ActionStatus.SUCCESSFULLY;
-        result.Status = ActionStatus.SUCCESSFULLY;
-        result.message = "Cập nhật lượt vote thành công";
-        return result;
+        return responseActionStatus.responseSuccess("Success", ActionStatus.SUCCESSFULLY);
     }
 }

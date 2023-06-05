@@ -95,12 +95,12 @@ public class PostController : Controller {
     public async Task<IActionResult> userlikePost(int postId, bool vote)
     {
         int userId = Convert.ToInt32(HttpContext.User.FindFirst("Id").Value);
-        ResponseData<ActionStatus> responseData = await postService.userLikePost(userId, postId, vote);
-        if (responseData.Data.Equals(ActionStatus.NOTFOUND)) {
-            return NotFound(responseData);
+        ResponseObject<ActionStatus> responseObject = await postService.userLikePost(userId, postId, vote);
+        if (responseObject.Data.Equals(ActionStatus.NOTFOUND)) {
+            return NotFound(responseObject);
         }
         
-        return Ok(responseData);
+        return Ok(responseObject);
     }
     
     
@@ -116,7 +116,7 @@ public class PostController : Controller {
             };
         }
 
-        ResponseData<ActionStatus> responseData = await postService.PinPost(postId);
+        ResponseObject<ActionStatus> responseData = await postService.PinPost(postId);
         if (responseData.Data.Equals(ActionStatus.NOTFOUND)) {
             return NotFound(responseData);
         }

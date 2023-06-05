@@ -14,7 +14,7 @@ public interface PostService {
     ResponseObject<PostDTO> getById(int id);
     ResponseObject<PostDTO> UpdatePost(int userId, int postId, PostRequest updatedPostRequest, List<string> updatedCategories);
     ResponseObject<List<PostDTO>> GetPostsByName(string? name, int pageNumber, int pageSize);
-    Task<ResponseData<ActionStatus>> PinPost(int postId);
-    Task<ResponseData<ActionStatus>> userLikePost(int userId, int postId, bool vote);
+    Task<ResponseObject<ActionStatus>> PinPost(int postId);
+    Task<ResponseObject<ActionStatus>> userLikePost(int userId, int postId, bool vote);
     
 }

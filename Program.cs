@@ -37,6 +37,7 @@ builder.Services.AddSingleton<ResponseObject<List<UserDTO>>>();
 builder.Services.AddSingleton<ResponseObject<List<CategoryDTO>>>();
 builder.Services.AddSingleton<ResponseObject<List<PostDTO>>>();
 builder.Services.AddSingleton<ResponseObject<Action>>();
+builder.Services.AddSingleton<ResponseObject<ActionStatus>>();
 builder.Services.AddSingleton<ResponseObject<PostDTO>>();
 builder.Services.AddSingleton<ResponseObject<CategoryDTO>>();
 builder.Services.AddSingleton<ResponseObject<string>>();
