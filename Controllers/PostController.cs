@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Writing.Entities;
+using Writing.Enumerates;
 using Writing.Payloads.DTOs;
 using Writing.Payloads.Requests;
 using Writing.Payloads.Responses;
@@ -86,6 +87,41 @@ public class PostController : Controller {
     {
         ResponseObject<List<PostDTO>> postDTOs = postService.GetPostsByName(name, pageNumber, pageSize);
         return Ok(postDTOs);
+    }
+    
+    
+    [HttpGet("/api/post/vote")]
+    [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<IActionResult> userlikePost(int postId, bool vote)
+    {
+        int userId = Convert.ToInt32(HttpContext.User.FindFirst("Id").Value);
+        ResponseData<ActionStatus> responseData = await postService.userLikePost(userId, postId, vote);
+        if (responseData.Data.Equals(ActionStatus.NOTFOUND)) {
+            return NotFound(responseData);
+        }
+        
+        return Ok(responseData);
+    }
+    
+    
+    [HttpPut("/api/post/pin")]
+    [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<IActionResult> PinPost(int postId)
+    {
+        var role = HttpContext.User.FindFirst("Role").Value;
+        
+        if (!role.Equals("ADMIN_ROLE") && !role.Equals("MOD_ROLE")) {
+            return new ObjectResult("Resource access by Admin and Moderators") {
+                StatusCode = 403
+            };
+        }
+
+        ResponseData<ActionStatus> responseData = await postService.PinPost(postId);
+        if (responseData.Data.Equals(ActionStatus.NOTFOUND)) {
+            return NotFound(responseData);
+        }
+
+        return Ok(responseData);
     }
 
 }
