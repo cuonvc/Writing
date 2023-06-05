@@ -55,6 +55,7 @@ public class PostServiceImpl : PostService {
         postConverter.requestToEntity(postRequest, postPending);
         postPending.User = dataContext.Users.Where(user => user.Id.Equals(userId)).FirstOrDefault();
         postPending.Categories = categoryList;
+        postPending.ModifiedDate = DateTime.Now;
         dataContext.SaveChanges();
 
         return responseObject.responseSuccess("Success", postConverter.entityToDto(postPending));
@@ -90,6 +91,8 @@ public class PostServiceImpl : PostService {
                 "Post not found with id: " + id, null);
         }
 
+        post.View++;
+        dataContext.SaveChanges();
         return responseObject.responseSuccess("Success", postConverter.entityToDto(post));
     }
 
@@ -146,6 +149,7 @@ public class PostServiceImpl : PostService {
         postToUpdate.Categories.Clear();
         postToUpdate.Categories.AddRange(updatedCategoryList);
 
+        postToUpdate.ModifiedDate = DateTime.Now;
         dataContext.SaveChanges();
         var updatedPostDto = postConverter.entityToDto(postToUpdate);
         return responseObject.responseSuccess("Updated successfully", updatedPostDto);
@@ -163,7 +167,18 @@ public class PostServiceImpl : PostService {
             .ToList();
         return responseList.responseSuccess("Success", postDTOs);
     }
-    
+
+    public ResponseObject<List<PostDTO>> getAll(int pageNum, int pageSize) {
+        List<PostDTO> postDTOs = dataContext.Posts
+            .Include(x => x.User)
+            .Include(x => x.Categories)
+            .Skip((pageNum - 1) * pageSize)
+            .Take(pageSize)
+            .Select(x => postConverter.entityToDto(x))
+            .ToList();
+        return responseList.responseSuccess("Success", postDTOs);
+    }
+
     public async Task<ResponseObject<ActionStatus>> PinPost(int postId)
     {
         Post post = await dataContext.Posts.FindAsync(postId);

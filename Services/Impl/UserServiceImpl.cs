@@ -67,6 +67,7 @@ public class UserServiceImpl : UserService {
         }
 
         userConverter.updateToEntity(user, request);
+        user.ModifiedDate = DateTime.Now;
         dataContext.SaveChanges();
         return responseObject.responseSuccess("Updated successfully", userConverter.entityToDto(user));
     }
@@ -80,6 +81,7 @@ public class UserServiceImpl : UserService {
         if (isImageFile(file)) {
             User user = dataContext.Users.Where(user => user.Id.Equals(id)).FirstOrDefault();
             user.AvatarPhoto = fileHandler.generatePath(file, id, "avatar");
+            user.ModifiedDate = DateTime.Now;
             dataContext.SaveChanges();
             
             return responseObject.responseSuccess("Update avatar successfully", userConverter.entityToDto(user));
@@ -97,6 +99,7 @@ public class UserServiceImpl : UserService {
         if (isImageFile(file)) {
             User user = dataContext.Users.Where(user => user.Id.Equals(id)).FirstOrDefault();
             user.CoverPhoto = fileHandler.generatePath(file, id, "cover");
+            user.ModifiedDate = DateTime.Now;
             dataContext.SaveChanges();
             
             return responseObject.responseSuccess("Update cover successfully", userConverter.entityToDto(user));
@@ -160,6 +163,7 @@ public class UserServiceImpl : UserService {
 
         string newPasswordEncoded = securityConfiguration.encodePassword(newPassword, user.Salt);
         user.Password = newPasswordEncoded;
+        user.ModifiedDate = DateTime.Now;
 
         dataContext.SaveChanges();
         return responseObject.responseSuccess("Success", userConverter.entityToDto(user));

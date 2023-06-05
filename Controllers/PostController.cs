@@ -89,6 +89,14 @@ public class PostController : Controller {
         return Ok(postDTOs);
     }
     
+    [HttpGet]
+    [Route("/api/post/all")]
+    public IActionResult getAll([FromHeader] int pageNumber, [FromHeader] int pageSize)
+    {
+        ResponseObject<List<PostDTO>> postDTOs = postService.getAll(pageNumber, pageSize);
+        return Ok(postDTOs);
+    }
+    
     
     [HttpGet("/api/post/vote")]
     [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
