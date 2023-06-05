@@ -17,22 +17,32 @@ public class PostController : Controller {
     public PostController(PostService postService) {
         this.postService = postService;
     }
+    
+    [HttpPost]
+    [Route("/api/post/pre-thumb")]
+    [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public IActionResult preUploadThumbnail(IFormFile file) {
+        int id = Convert.ToInt32(HttpContext.User.FindFirst("Id").Value);
+        ResponseObject<string> responseUrl = postService.cacheThumbnail(id, file);
+        return Ok(responseUrl);
+    }
 
     [HttpPost]
-    [Route("/api/post")]
+    [Route("/api/post/submit")]
     [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public IActionResult create([FromHeader] List<string> cateogries, PostRequest postRequest) {
+    public IActionResult submitPost([FromHeader] List<string> cateogries, PostRequest postRequest) {
         int id = Convert.ToInt32(HttpContext.User.FindFirst("Id").Value);
-        ResponseObject<PostDTO> responseObject = postService.createPost(id, postRequest, cateogries);
+        ResponseObject<PostDTO> responseObject = postService.submitPostCreate(id, postRequest, cateogries);
         return Ok(responseObject);
     }
-    
+
     [HttpPut]
     [Route("/api/post/{id}")]
     [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public IActionResult update(int id, PostRequest request, [FromHeader] List<string> categories)
     {
-        ResponseObject<PostDTO> responseObject = postService.UpdatePost(id, request, categories);
+        int userId = Convert.ToInt32(HttpContext.User.FindFirst("Id").Value);
+        ResponseObject<PostDTO> responseObject = postService.UpdatePost(userId, id, request, categories);
         if (responseObject.Data == null) {
             return NotFound(responseObject);
         }
@@ -74,7 +84,7 @@ public class PostController : Controller {
     [Route("/api/post/list")]
     public IActionResult getPosts([FromHeader] string name, [FromHeader] int pageNumber, [FromHeader] int pageSize)
     {
-        List<PostDTO> postDTOs = postService.GetPostsByName(name, pageNumber, pageSize);
+        ResponseObject<List<PostDTO>> postDTOs = postService.GetPostsByName(name, pageNumber, pageSize);
         return Ok(postDTOs);
     }
 

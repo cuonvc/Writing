@@ -7,9 +7,10 @@ namespace Writing.Services;
 
 public interface PostService {
 
-    ResponseObject<PostDTO> createPost(int userId, PostRequest postRequest, List<string> categories);
+    ResponseObject<PostDTO> submitPostCreate(int userId, PostRequest postRequest, List<string> categories);
+    ResponseObject<string> cacheThumbnail(int userId, IFormFile file);
     ResponseObject<PostDTO> DeletePost(int postId);
     ResponseObject<PostDTO> getById(int id);
-    ResponseObject<PostDTO> UpdatePost(int postId, PostRequest updatedPostRequest, List<string> updatedCategories);
-    List<PostDTO> GetPostsByName(string? name, int pageNumber, int pageSize);
+    ResponseObject<PostDTO> UpdatePost(int userId, int postId, PostRequest updatedPostRequest, List<string> updatedCategories);
+    ResponseObject<List<PostDTO>> GetPostsByName(string? name, int pageNumber, int pageSize);
 }
