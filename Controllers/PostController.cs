@@ -77,5 +77,16 @@ public class PostController : Controller {
         List<PostDTO> postDTOs = postService.GetPostsByName(name, pageNumber, pageSize);
         return Ok(postDTOs);
     }
+    [HttpGet("/api/post/userlikepost")]
+    public async Task<IActionResult> userlikePost(int userId, int postId, bool userLike)
+    {
+        return Ok(await postService.userLikePost(userId, postId, userLike));
+    }
+    [HttpPut("/api/post/pin-post")]
+
+    public async Task<IActionResult> PinPost(int postId)
+    {
+        return Ok(await postService.PinPost(postId));
+    }
 
 }

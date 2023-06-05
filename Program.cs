@@ -48,7 +48,7 @@ builder.Services.AddTransient<PostService, PostServiceImpl>();
 builder.Services.AddTransient<CategoryService, CategoryServiceImpl>();
 builder.Services.AddTransient<CommentService, CommentServiceImpl>();
 builder.Services.AddDbContext<DataContext>(options => {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("OtherConnection"));
 });
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => {

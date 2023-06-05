@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Writing.Entities;
+using Writing.Enumerates;
 using Writing.Payloads.Converters;
 using Writing.Payloads.DTOs;
 using Writing.Payloads.Requests;
@@ -89,7 +90,6 @@ public class PostServiceImpl : PostService {
         postToUpdate.Categories.AddRange(updatedCategoryList);
 
         dataContext.SaveChanges();
-
         var updatedPostDto = postConverter.entityToDto(postToUpdate);
         return responseObject.responseSuccess("Cập nhật thông tin bài đăng thành công", updatedPostDto);
     }
@@ -104,5 +104,89 @@ public class PostServiceImpl : PostService {
             .Select(x => postConverter.entityToDto(x))
             .ToList();
         return postDTOs;
+    }
+    public async Task<ResponseData<ActionStatus>> PinPost(int postId)
+    {
+        ResponseData<ActionStatus> result = new ResponseData<ActionStatus>();
+
+        Post post = await dataContext.Posts.FindAsync(postId);
+
+        if (post == null)
+        {
+            result.Data = ActionStatus.NOTFOUND;
+            result.Status = ActionStatus.FAILED;
+            result.message = $"Bài viết có id: {postId} không tồn tại";
+            return result;
+        }
+
+        post.Pined = true;
+        dataContext.Posts.Update(post);
+        await dataContext.SaveChangesAsync();
+
+        result.Data = ActionStatus.SUCCESSFULLY;
+        result.Status = ActionStatus.SUCCESSFULLY;
+        result.message = "Bài viết đã được ghim thành công!";
+
+        return result;
+    }
+    public async Task<ResponseData<ActionStatus>> userLikePost(int userId, int postId, bool userLike)
+    {
+        ResponseData<ActionStatus> result = new ResponseData<ActionStatus>();
+        if (!await dataContext.Users.AnyAsync(x => x.Id == userId))
+        {
+            result.Data = ActionStatus.NOTFOUND;
+            result.Status = ActionStatus.FAILED;
+            result.message = $"Người dùng có id: {userId} không tồn tại";
+            return result;
+        }
+        Post post = await dataContext.Posts.FindAsync(postId);
+        if (post == null)
+        {
+            result.Data = ActionStatus.NOTFOUND;
+            result.Status = ActionStatus.FAILED;
+            result.message = $"Bài viết có id: {userId} không tồn tại";
+            return result;
+        }
+        else
+        {
+            if (userLike)
+            {
+                if (post.VoteDown > 0)
+                {
+                    post.VoteUp++;
+                    post.VoteDown--;
+                }
+                else
+                {
+                    post.VoteUp++;
+                    post.VoteDown = 0;
+                }
+                dataContext.Posts.Update(post);
+                await dataContext.SaveChangesAsync();
+                result.Data = ActionStatus.SUCCESSFULLY;
+                result.Status = ActionStatus.SUCCESSFULLY;
+                result.message = "Cập nhật lượt like thành công";
+                return result;
+            }
+            else
+            {
+                if (post.VoteUp > 0)
+                {
+                    post.VoteDown++;
+                    post.VoteUp--;
+                }
+                else
+                {
+                    post.VoteDown++;
+                    post.VoteUp = 0;
+                }
+                dataContext.Posts.Update(post);
+                await dataContext.SaveChangesAsync();
+                result.Data = ActionStatus.SUCCESSFULLY;
+                result.Status = ActionStatus.SUCCESSFULLY;
+                result.message = "Cập nhật lượt dislike thành công";
+                return result;
+            }
+        }
     }
 }

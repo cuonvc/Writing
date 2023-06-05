@@ -1,4 +1,5 @@
 ﻿using Writing.Entities;
+using Writing.Enumerates;
 using Writing.Payloads.DTOs;
 using Writing.Payloads.Requests;
 using Writing.Payloads.Responses;
@@ -12,4 +13,6 @@ public interface PostService {
     ResponseObject<PostDTO> getById(int id);
     ResponseObject<PostDTO> UpdatePost(int postId, PostRequest updatedPostRequest, List<string> updatedCategories);
     List<PostDTO> GetPostsByName(string? name, int pageNumber, int pageSize);
+    Task<ResponseData<ActionStatus>> PinPost(int postId);
+    Task<ResponseData<ActionStatus>> userLikePost(int userId, int postId, bool userLike);
 }
