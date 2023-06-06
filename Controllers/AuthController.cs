@@ -7,7 +7,6 @@ using Writing.Services;
 namespace Writing.Controllers; 
 
 [ApiController]
-[Route("/api/auth")]
 public class AuthController : Controller {
 
     private readonly AuthService authService;
@@ -16,7 +15,8 @@ public class AuthController : Controller {
         this.authService = authService;
     }
 
-    [HttpPost("/signup")]
+    [HttpPost]
+    [Route("/api/auth/signup")]
     public IActionResult register(RegisterRequest request) {
         ResponseObject<UserDTO> responseObject = authService.register(request);
         if (responseObject.Data == null) {
@@ -26,7 +26,8 @@ public class AuthController : Controller {
         return Ok(responseObject);
     }
 
-    [HttpPost("/login")]
+    [HttpPost]
+    [Route("/api/auth/login")]
     public IActionResult login(LoginRequest request) {
         ResponseObject<ResponseTokenObject> responseObject = authService.login(request);
         if (responseObject == null) {
@@ -36,7 +37,8 @@ public class AuthController : Controller {
         return Ok(responseObject);
     }
 
-    [HttpPost("/token/renew")]
+    [HttpPost]
+    [Route("/api/auth/token/renew")]
     public IActionResult renewAccessToken(TokenObjectRequest request) {
         ResponseObject<ResponseTokenObject> responseObject = authService.renewAccessToken(request);
         if (responseObject == null) {

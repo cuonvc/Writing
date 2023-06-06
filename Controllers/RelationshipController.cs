@@ -8,7 +8,6 @@ using Action = Writing.Enumerates.Action;
 namespace Writing.Controllers; 
 
 [ApiController]
-[Route("/api/follow")]
 public class RelationshipController : Controller {
 
     private readonly RelationshipService relationshipService;
@@ -18,6 +17,7 @@ public class RelationshipController : Controller {
     }
 
     [HttpPost]
+    [Route("/api/user/follow")]
     [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public IActionResult follow([FromHeader] int partnerId, [FromHeader] string action) {
         int ownerId = Convert.ToInt32(HttpContext.User.FindFirst("Id").Value);
