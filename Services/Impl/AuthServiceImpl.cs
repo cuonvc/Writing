@@ -45,6 +45,8 @@ public class AuthServiceImpl : AuthService {
                 "Email has been registered an account", null);
         }
         User user = userConverter.regRequestToEntity(request);
+        user.AvatarPhoto = "resource%2Fimages%2Fdefault%2Fdefault_avt.png";
+        user.CoverPhoto = "resource%2Fimages%2Fdefault%2Fdefault_cover.png";
         dataContext.Users.Add(user);
         dataContext.SaveChanges();
         

@@ -49,7 +49,13 @@ public class PostServiceImpl : PostService {
         Post postPending = dataContext.Posts
             .FromSql($"SELECT * FROM Posts_tbl WHERE userId = {userId} AND isActive = 0")
             .OrderBy(post => post.Id)
-            .Last();
+            .LastOrDefault();
+
+        //create post not contains image
+        if (postPending == null) {
+            postPending = new Post();
+            postPending.Thumbnail = "resource%2Fimages%2Fdefault%2Fdefault-thumbnail.png";
+        }
         
         postPending.isActive = true;
         postConverter.requestToEntity(postRequest, postPending);
