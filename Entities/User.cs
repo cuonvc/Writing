@@ -37,6 +37,6 @@ public class User : BaseEntity {
     
     public List<Post> Posts { get; set; } = new List<Post>();
     
-    public List<Comment> Comments = new List<Comment>();
+    public List<Comment> Comments { get; set; }= new List<Comment>();
     
 }

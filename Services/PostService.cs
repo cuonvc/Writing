@@ -16,6 +16,6 @@ public interface PostService {
     ResponseObject<List<PostDTO>> GetPostsByName(string? name, int pageNumber, int pageSize);
     ResponseObject<List<PostDTO>> getAll(int pageNum, int pageSize);
     Task<ResponseObject<ActionStatus>> PinPost(int postId);
-    Task<ResponseObject<ActionStatus>> userLikePost(int userId, int postId, bool vote);
+    Task<ResponseObject<string>> votePost(int userId, int postId, string voteType);
     
 }

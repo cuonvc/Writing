@@ -17,9 +17,7 @@ public class Post : BaseEntity {
     [MaybeNull]
     public string Thumbnail { get; set; }
     
-    public int VoteUp { get; set; } = 0;
-    
-    public int VoteDown { get; set; } = 0;
+    public int Vote { get; set; } = 0;
     
     public int View { get; set; } = 0;
     

@@ -45,7 +45,7 @@ public class UserConverter {
             CreatedBy = entity.CreatedBy,
             ModifiedDate = entity.ModifiedDate,
             ModifiedBy = entity.ModifiedBy,
-            isActive = entity.isActive
+            isActive = entity.IsActive
         };
     }
 

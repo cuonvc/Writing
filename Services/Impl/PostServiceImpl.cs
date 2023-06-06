@@ -57,7 +57,7 @@ public class PostServiceImpl : PostService {
             postPending.Thumbnail = "resource%2Fimages%2Fdefault%2Fdefault-thumbnail.png";
         }
         
-        postPending.isActive = true;
+        postPending.IsActive = true;
         postConverter.requestToEntity(postRequest, postPending);
         postPending.User = dataContext.Users.Where(user => user.Id.Equals(userId)).FirstOrDefault();
         postPending.Categories = categoryList;
@@ -69,7 +69,7 @@ public class PostServiceImpl : PostService {
 
     public ResponseObject<string> cacheThumbnail(int userId, IFormFile file) {
         //init post to get ID
-        Post initPost = new Post {Title = "", Content = "", isActive = false};
+        Post initPost = new Post {Title = "", Content = "", IsActive = false};
         initPost.Categories = new List<Category>();
         initPost.User = dataContext.Users.Where(user => user.Id.Equals(userId)).FirstOrDefault();
         dataContext.Posts.Add(initPost);
@@ -89,7 +89,7 @@ public class PostServiceImpl : PostService {
     public ResponseObject<PostDTO> getById(int id) {
         Post post = dataContext.Posts.Include(entity => entity.User)
             .Include(entity => entity.Categories)
-            .Where(post => post.Id.Equals(id) && post.isActive == true)
+            .Where(post => post.Id.Equals(id) && post.IsActive == true)
             .FirstOrDefault();
 
         if (post == null) {
@@ -137,7 +137,7 @@ public class PostServiceImpl : PostService {
         }
 
         Post postTemporary = dataContext.Posts
-            .Where(post => post.User.Id.Equals(userId) && post.isActive == false)
+            .Where(post => post.User.Id.Equals(userId) && post.IsActive == false)
             .OrderBy(post => post.Id)
             .Last();  //nullable -> ok
 
@@ -166,7 +166,7 @@ public class PostServiceImpl : PostService {
         List<PostDTO> postDTOs = dataContext.Posts
             .Include(x => x.User)
             .Include(x => x.Categories)
-            .Where(x => x.Title.Trim().ToLower().Contains(name.ToLower().Trim()) && x.isActive == true)
+            .Where(x => x.Title.Trim().ToLower().Contains(name.ToLower().Trim()) && x.IsActive == true)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .Select(x => postConverter.entityToDto(x))
@@ -206,27 +206,36 @@ public class PostServiceImpl : PostService {
 
         return responseActionStatus.responseSuccess("Success", ActionStatus.SUCCESSFULLY);
     }
-    public async Task<ResponseObject<ActionStatus>> userLikePost(int userId, int postId, bool vote) {
-        if (!await dataContext.Users.AnyAsync(x => x.Id == userId)) {
-            responseActionStatus.Data = ActionStatus.NOTFOUND;
-            return responseActionStatus.responseError(StatusCodes.Status404NotFound,
-                $"Người dùng có id: {userId} không tồn tại", ActionStatus.NOTFOUND);
-        }
-        
+    
+    public async Task<ResponseObject<string>> votePost(int userId, int postId, string voteType) {
+
+        User user = await dataContext.Users.Where(user => user.Id.Equals(userId)).FirstOrDefaultAsync();
+
         Post post = await dataContext.Posts.FindAsync(postId);
         if (post == null) {
-            return responseActionStatus.responseError(StatusCodes.Status404NotFound,
-                $"Bài viết có id: {userId} không tồn tại", ActionStatus.NOTFOUND);
-        }
-
-        if (!vote) {
-            post.VoteDown += 1;
-        } else {
-            post.VoteUp += 1;
+            return responseString.responseError(StatusCodes.Status404NotFound,
+                $"Bài viết có id: {postId} không tồn tại", null);
         }
         
+        UserPostVote userPostVote = dataContext.UserPostVotes
+            .Where(vote => vote.Post.Equals(post) && vote.User.Equals(user))
+            .FirstOrDefault();
+
+        if (userPostVote == null) {
+            dataContext.UserPostVotes.Add(new UserPostVote { User = user, Post = post, VoteType = voteType });
+        } else {
+            if (userPostVote.VoteType.Equals(voteType)) {
+                return responseString.responseError(StatusCodes.Status400BadRequest,
+                    $"This user has {userPostVote.VoteType}VOTE", null);
+            }
+
+            userPostVote.VoteType = voteType;
+        }
+
+        post.Vote += voteType.Equals(nameof(VoteType.UP)) ? 1 : -1;
         dataContext.Posts.Update(post);
+        
         await dataContext.SaveChangesAsync();
-        return responseActionStatus.responseSuccess("Success", ActionStatus.SUCCESSFULLY);
+        return responseString.responseSuccess("Success", voteType);
     }
 }

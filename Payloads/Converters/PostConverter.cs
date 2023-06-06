@@ -40,15 +40,14 @@ public class PostConverter {
             Description = entity.Description,
             Content = entity.Content,
             Thumbnail = baseUrl + entity.Thumbnail,
-            VoteUp = entity.VoteUp,
-            VoteDown = entity.VoteDown,
+            Vote = entity.Vote,
             View = entity.View,
             Pined = entity.Pined,
             CreatedDate = entity.CreatedDate,
             CreatedBy = entity.CreatedBy,
             ModifiedDate = entity.ModifiedDate,
             ModifiedBy = entity.ModifiedBy,
-            isActive = entity.isActive,
+            isActive = entity.IsActive,
             Categories = entity.Categories.Select(category => categoryConverter.entityToDto(category)).ToList(),
             User = userConverter.entityToDto(entity.User)
         };

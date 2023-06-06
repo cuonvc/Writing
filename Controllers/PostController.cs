@@ -100,12 +100,12 @@ public class PostController : Controller {
     
     [HttpGet("/api/post/vote")]
     [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<IActionResult> userlikePost(int postId, bool vote)
+    public async Task<IActionResult> userVotePost(int postId, [FromHeader] string voteType)
     {
         int userId = Convert.ToInt32(HttpContext.User.FindFirst("Id").Value);
-        ResponseObject<ActionStatus> responseObject = await postService.userLikePost(userId, postId, vote);
-        if (responseObject.Data.Equals(ActionStatus.NOTFOUND)) {
-            return NotFound(responseObject);
+        ResponseObject<string> responseObject = await postService.votePost(userId, postId, voteType);
+        if (responseObject.Data == null) {
+            return BadRequest(responseObject);
         }
         
         return Ok(responseObject);

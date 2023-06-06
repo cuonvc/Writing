@@ -54,7 +54,7 @@ namespace Writing.Services.Impl
             comment.content = content;
             comment.CreatedDate = DateTime.Now;
             comment.ModifiedDate = DateTime.Now;
-            comment.isActive = false;
+            comment.IsActive = false;
 
             await dataContext.Comments.AddAsync(comment);
             await dataContext.SaveChangesAsync();
@@ -92,7 +92,7 @@ namespace Writing.Services.Impl
             cmt.content = content;
             cmt.CreatedDate = DateTime.Now;
             cmt.ModifiedDate = DateTime.Now;
-            cmt.isActive = false;
+            cmt.IsActive = false;
 
             await dataContext.SaveChangesAsync();
 

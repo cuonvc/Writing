@@ -20,5 +20,5 @@ public class BaseEntity {
     [MaybeNull]
     public string ModifiedBy { get; set; }
     
-    public bool isActive { get; set; } = true;
+    public bool IsActive { get; set; } = true;
 }
