@@ -121,7 +121,7 @@ public class AuthServiceImpl : AuthService {
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
         var token = new JwtSecurityToken(
             claims: claims,
-            expires: DateTime.Now.AddMinutes(10),
+            expires: DateTime.Now.AddHours(23),
             signingCredentials: credentials);
         
         return new JwtSecurityTokenHandler().WriteToken(token);

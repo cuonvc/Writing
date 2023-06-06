@@ -91,7 +91,7 @@ public class PostController : Controller {
     
     [HttpGet]
     [Route("/api/post/all")]
-    public IActionResult getAll([FromHeader] int pageNumber, [FromHeader] int pageSize)
+    public IActionResult getAll(int pageNumber, int pageSize)
     {
         ResponseObject<List<PostDTO>> postDTOs = postService.getAll(pageNumber, pageSize);
         return Ok(postDTOs);

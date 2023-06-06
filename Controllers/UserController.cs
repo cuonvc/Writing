@@ -23,9 +23,9 @@ public class UserController : Controller {
     }
 
     [HttpGet]
-    [Route("/api/user/{id}")]
-    public IActionResult getUser(int id) {
-        ResponseObject<UserDTO> responseObject = userService.getById(id);
+    [Route("/api/user/{email}")]
+    public IActionResult getUser(string email) {
+        ResponseObject<UserDTO> responseObject = userService.getByEmail(email);
         if (responseObject.Data == null) {
             return NotFound(responseObject);
         }

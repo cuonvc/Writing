@@ -37,12 +37,12 @@ public class UserServiceImpl : UserService {
         this.fileHandler = fileHandler;
     }
 
-    public ResponseObject<UserDTO> getById(int id) {
-        User user = dataContext.Users.Where(user => user.Id.Equals(id)).FirstOrDefault();
+    public ResponseObject<UserDTO> getByEmail(string email) {
+        User user = dataContext.Users.Where(user => user.Email.Equals(email)).FirstOrDefault();
 
         if (user == null) {
             return responseObject.responseError(StatusCodes.Status404NotFound, 
-                "User not found with id: " + id, null);
+                "User not found with username: " + email, null);
         }
 
         return responseObject.responseSuccess("Success", userConverter.entityToDto(user));

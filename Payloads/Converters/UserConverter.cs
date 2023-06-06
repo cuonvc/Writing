@@ -38,6 +38,7 @@ public class UserConverter {
             Email = entity.Email,
             About = entity.About,
             Gender = entity.Gender,
+            Role = entity.Role,
             DateOfBirth = entity.DateOfBirth,
             AvatarPhoto = baseUrl + entity.AvatarPhoto, //http://localhost:8080/...
             CoverPhoto = baseUrl + entity.CoverPhoto,
