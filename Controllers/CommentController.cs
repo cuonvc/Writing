@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Writing.Enumerates;
 using Writing.Services;
 
 namespace Writing.Controllers
@@ -13,17 +17,45 @@ namespace Writing.Controllers
         {
             _commentService = commentService;
         }
-        
-        
-        [HttpPost("usercmtpost")]
-        public async Task<IActionResult> create(int userId, int postId, string content)
+        [HttpPost]
+        [Route("usercmtpost")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> userCmtPost(int postId, string content)
         {
-            return Ok(await _commentService.userCmtPost(userId, postId, content));
+            var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return BadRequest("Không tìm thấy thông tin người dùng.");
+            }
+
+            var result = await _commentService.userCmtPost(userId, postId, content);
+            if (result.Status == ActionStatus.FAILED)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
-        [HttpPut("usersubcmtpost")]
-        public async Task<IActionResult> userSubCmtPost(int userId, string content, int cmtId)
+
+        [HttpGet("userlikepost")]
+        public async Task<IActionResult> userlikePost(int userId, int postId, bool userLike)
         {
-            return Ok(await _commentService.userSubCmtPost(userId, content, cmtId));
+            return Ok(await _commentService.userLikePost(userId, postId, userLike));
+        }
+
+        [HttpGet("get-all-comment")]
+        public async Task<IActionResult> getAllCommentOfPost(int postId)
+        {
+            return Ok(await _commentService.GetAllCommentsByPost(postId));
+        }
+        [HttpPut("update-comment")]
+        public async Task<IActionResult> updateComment(int postId, int commentId, string content)
+        {
+            return Ok(await _commentService.UpdateComment(postId, commentId, content));
+        }
+        [HttpDelete("delete-comment")]
+        public async Task<IActionResult> deleteComment(int postId, int commentId)
+        {
+            return Ok(await _commentService.DeleteComment(postId, commentId));
         }
     }
 }

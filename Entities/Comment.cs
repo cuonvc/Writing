@@ -8,10 +8,12 @@ namespace Writing.Entities;
 public class Comment : BaseEntity {
 
     public string content { get; set; }
+    public int PostId { get; set; }
     
     public Post Post { get; set; }
     
     [MaybeNull]
+    public int UserId { get; set; }
     public User User { get; set; }
     
 }
