@@ -31,16 +31,16 @@ public class PostController : Controller {
     [HttpPost]
     [Route("/api/post/submit")]
     [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public IActionResult submitPost([FromHeader] List<string> cateogries, PostRequest postRequest) {
+    public IActionResult submitPost([FromQuery] List<int> categories, PostRequest postRequest) {
         int id = Convert.ToInt32(HttpContext.User.FindFirst("Id").Value);
-        ResponseObject<PostDTO> responseObject = postService.submitPostCreate(id, postRequest, cateogries);
+        ResponseObject<PostDTO> responseObject = postService.submitPostCreate(id, postRequest, categories);
         return Ok(responseObject);
     }
 
     [HttpPut]
     [Route("/api/post/{id}")]
     [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public IActionResult update(int id, PostRequest request, [FromHeader] List<string> categories)
+    public IActionResult update(int id, PostRequest request, [FromQuery] List<int> categories)
     {
         int userId = Convert.ToInt32(HttpContext.User.FindFirst("Id").Value);
         ResponseObject<PostDTO> responseObject = postService.UpdatePost(userId, id, request, categories);
@@ -83,7 +83,7 @@ public class PostController : Controller {
 
     [HttpGet]
     [Route("/api/post/list")]
-    public IActionResult getPosts([FromHeader] string name, [FromHeader] int pageNumber, [FromHeader] int pageSize)
+    public IActionResult getPosts(string name, int pageNumber, int pageSize)
     {
         ResponseObject<List<PostDTO>> postDTOs = postService.GetPostsByName(name, pageNumber, pageSize);
         return Ok(postDTOs);
@@ -100,7 +100,7 @@ public class PostController : Controller {
     
     [HttpGet("/api/post/vote")]
     [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<IActionResult> userVotePost(int postId, [FromHeader] string voteType)
+    public async Task<IActionResult> userVotePost(int postId, string voteType)
     {
         int userId = Convert.ToInt32(HttpContext.User.FindFirst("Id").Value);
         ResponseObject<string> responseObject = await postService.votePost(userId, postId, voteType);

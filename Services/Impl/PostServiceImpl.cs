@@ -40,10 +40,10 @@ public class PostServiceImpl : PostService {
         this.responseActionStatus = responseActionStatus;
     }
     
-    public ResponseObject<PostDTO> submitPostCreate(int userId, PostRequest postRequest, List<string> categories) {
-        List<Category> categoryList = categories
-            .Select(category => dataContext.Categories
-                .Where(c => c.Name.Equals(category)).FirstOrDefault())
+    public ResponseObject<PostDTO> submitPostCreate(int userId, PostRequest postRequest, List<int> categoryIds) {
+        List<Category> categoryList = categoryIds
+            .Select(categoryId => dataContext.Categories
+                .Where(c => c.Id.Equals(categoryId)).FirstOrDefault())
             .ToList();
 
         Post postPending = dataContext.Posts
@@ -55,6 +55,7 @@ public class PostServiceImpl : PostService {
         if (postPending == null) {
             postPending = new Post();
             postPending.Thumbnail = "resource%2Fimages%2Fdefault%2Fdefault-thumbnail.png";
+            dataContext.Posts.Add(postPending);
         }
         
         postPending.IsActive = true;
@@ -104,22 +105,36 @@ public class PostServiceImpl : PostService {
 
     public ResponseObject<PostDTO> DeletePost(int postId)
     {
-        var postToDelete = dataContext.Posts.Include(x => x.User).Include(x => x.Categories).FirstOrDefault(x => x.Id == postId);
+        var postToDelete = dataContext.Posts.FirstOrDefault(x => x.Id.Equals(postId));
 
-        if (postToDelete == null)
-        {
+        if (postToDelete == null) {
             return responseObject.responseError(StatusCodes.Status404NotFound, "Không tìm thấy bài viết", null);
         }
+        
+//hard delete
+        // //remove comments by post
+        // dataContext.RemoveRange(dataContext.Comments.Where(c => c.Post.Id.Equals(postId)));
+        //
+        // //clear in postCategory table
+        // dataContext.Posts
+        //     .Include(entity => entity.Categories)
+        //     .FirstOrDefault(post => post.Id.Equals(postId))
+        //     .Categories.Clear();
+        //
+        // //clear in userPostVote table
+        // dataContext.UserPostVotes.RemoveRange(dataContext.UserPostVotes
+        //     .Where(uv => uv.Post.Id.Equals(postId)));
+        //
+        // dataContext.Posts.Remove(postToDelete);
+//soft delete
+        postToDelete.IsActive = false;
 
-        dataContext.Posts.Remove(postToDelete);
         dataContext.SaveChanges();
-
-        var deletedPostDto = postConverter.entityToDto(postToDelete);
-        return responseObject.responseSuccess("Xóa bài đăng thành công", deletedPostDto);
+        return responseObject.responseSuccess("Xóa bài đăng thành công", new PostDTO());
     }
     
 
-    public ResponseObject<PostDTO> UpdatePost(int userId, int postId, PostRequest request, List<string> categories)
+    public ResponseObject<PostDTO> UpdatePost(int userId, int postId, PostRequest request, List<int> categoryIds)
     {
         var postToUpdate = dataContext.Posts
             .Include(entity => entity.User)
@@ -139,7 +154,7 @@ public class PostServiceImpl : PostService {
         Post postTemporary = dataContext.Posts
             .Where(post => post.User.Id.Equals(userId) && post.IsActive == false)
             .OrderBy(post => post.Id)
-            .Last();  //nullable -> ok
+            .LastOrDefault();  //nullable -> ok
 
         //if update thumbnail -> get thumbnail from temporary post and delete itself
         if (postTemporary != null) {
@@ -149,11 +164,12 @@ public class PostServiceImpl : PostService {
 
         postConverter.requestToEntity(request, postToUpdate);
 
-        var updatedCategoryList = categories
-            .Select(category => dataContext.Categories.FirstOrDefault(c => c.Name.Equals(category)))
+        var updatedCategoryList = categoryIds
+            .Select(id => dataContext.Categories.FirstOrDefault(c => c.Id.Equals(id)))
             .ToList();
+        
         postToUpdate.Categories.Clear();
-        postToUpdate.Categories.AddRange(updatedCategoryList);
+        postToUpdate.Categories = updatedCategoryList;
 
         postToUpdate.ModifiedDate = DateTime.Now;
         dataContext.SaveChanges();
@@ -178,6 +194,7 @@ public class PostServiceImpl : PostService {
         List<PostDTO> postDTOs = dataContext.Posts
             .Include(x => x.User)
             .Include(x => x.Categories)
+            .Where(post => post.IsActive == true)
             .Skip((pageNum - 1) * pageSize)
             .Take(pageSize)
             .Select(x => postConverter.entityToDto(x))
