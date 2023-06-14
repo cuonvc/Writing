@@ -33,6 +33,7 @@ public class CategoryServiceImpl : CategoryService {
         }
         
         category = new Category { Name = request.Name };
+        
         dataContext.Categories.Add(category);
         dataContext.SaveChanges();
 

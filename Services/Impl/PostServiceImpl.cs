@@ -41,6 +41,11 @@ public class PostServiceImpl : PostService {
     }
     
     public ResponseObject<PostDTO> submitPostCreate(int userId, PostRequest postRequest, List<int> categoryIds) {
+        User user = dataContext.Users.Where(user => user.Id.Equals(userId) && user.IsActive == true).FirstOrDefault();
+        if (user == null) {
+            return responseObject.responseError(StatusCodes.Status400BadRequest, "User chưa active tài khoản", null);
+        }
+        
         List<Category> categoryList = categoryIds
             .Select(categoryId => dataContext.Categories
                 .Where(c => c.Id.Equals(categoryId)).FirstOrDefault())
@@ -60,7 +65,7 @@ public class PostServiceImpl : PostService {
         
         postPending.IsActive = true;
         postConverter.requestToEntity(postRequest, postPending);
-        postPending.User = dataContext.Users.Where(user => user.Id.Equals(userId)).FirstOrDefault();
+        postPending.User = user;
         postPending.Categories = categoryList;
         postPending.ModifiedDate = DateTime.Now;
         dataContext.SaveChanges();
@@ -69,6 +74,11 @@ public class PostServiceImpl : PostService {
     }
 
     public ResponseObject<string> cacheThumbnail(int userId, IFormFile file) {
+
+        if (dataContext.Users.Where(user => user.Id == userId && user.IsActive == false).FirstOrDefault() == null) {
+            return responseString.responseError(StatusCodes.Status400BadRequest, "User chưa active tài khoản", null);
+        }
+        
         //init post to get ID
         Post initPost = new Post {Title = "", Content = "", IsActive = false};
         initPost.Categories = new List<Category>();
@@ -134,8 +144,12 @@ public class PostServiceImpl : PostService {
     }
     
 
-    public ResponseObject<PostDTO> UpdatePost(int userId, int postId, PostRequest request, List<int> categoryIds)
-    {
+    public ResponseObject<PostDTO> UpdatePost(int userId, int postId, PostRequest request, List<int> categoryIds) {
+        User user = dataContext.Users.Where(user => user.IsActive == true && user.Id.Equals(userId)).FirstOrDefault();
+        if (user == null) {
+            return responseObject.responseError(StatusCodes.Status404NotFound, 
+                "User chưa active tài khoản", null);
+        }
         var postToUpdate = dataContext.Posts
             .Include(entity => entity.User)
             .Include(entity => entity.Categories)
@@ -185,6 +199,7 @@ public class PostServiceImpl : PostService {
             .Where(x => x.Title.Trim().ToLower().Contains(name.ToLower().Trim()) && x.IsActive == true)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
+            .OrderByDescending(post => post.CreatedDate)
             .Select(x => postConverter.entityToDto(x))
             .ToList();
         return responseList.responseSuccess("Success", postDTOs);
@@ -195,6 +210,7 @@ public class PostServiceImpl : PostService {
             .Include(x => x.User)
             .Include(x => x.Categories)
             .Where(post => post.IsActive == true)
+            .OrderByDescending(post => post.CreatedDate)
             .Skip((pageNum - 1) * pageSize)
             .Take(pageSize)
             .Select(x => postConverter.entityToDto(x))

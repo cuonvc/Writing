@@ -7,6 +7,8 @@ namespace Writing.Services;
 
 public interface UserService {
 
+    ResponseObject<string> active(int userId, int activeCode);
+
     ResponseObject<UserDTO> getByEmail(string email);
 
     ResponseObject<List<UserDTO>> getAll(int pageNo, int pageSize);

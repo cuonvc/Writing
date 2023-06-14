@@ -11,7 +11,7 @@ using Writing.Payloads.Responses;
 using Writing.Repositories;
 using Writing.Services;
 
-namespace Writing.Controllers; 
+namespace Writing.Controllers;
 
 [ApiController]
 public class UserController : Controller {
@@ -20,6 +20,17 @@ public class UserController : Controller {
 
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    [HttpPost]
+    [Route("/api/user/active/{userId}")]
+    public IActionResult activeAccount(int userId, int activeCode) {
+        ResponseObject<string> responseObject = userService.active(userId, activeCode);
+        if (responseObject.Data == null) {
+            return NotFound(responseObject);
+        }
+
+        return Ok(responseObject);
     }
 
     [HttpGet]

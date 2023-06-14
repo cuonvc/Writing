@@ -5,7 +5,7 @@ using Writing.Payloads.Responses;
 namespace Writing.Services; 
 
 public interface AuthService {
-    ResponseObject<UserDTO> register(RegisterRequest request);
+    Task<ResponseObject<UserDTO>> register(RegisterRequest request);
 
     ResponseObject<ResponseTokenObject> login(LoginRequest request);
 

@@ -36,7 +36,9 @@ namespace Writing.Services.Impl
             }
             
             Comment comment = new Comment {
-                User = await dataContext.Users.FindAsync(userId),
+                User = await dataContext.Users
+                    .Where(user => user.Id.Equals(userId) && user.IsActive == true)
+                    .FirstOrDefaultAsync(),
                 Post = post,
                 content = content,
             };

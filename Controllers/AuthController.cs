@@ -17,8 +17,8 @@ public class AuthController : Controller {
 
     [HttpPost]
     [Route("/api/auth/signup")]
-    public IActionResult register(RegisterRequest request) {
-        ResponseObject<UserDTO> responseObject = authService.register(request);
+    public async Task<IActionResult> register(RegisterRequest request) {
+        ResponseObject<UserDTO> responseObject = await authService.register(request);
         if (responseObject.Data == null) {
             return BadRequest(responseObject);
         }

@@ -12,7 +12,7 @@ using Writing.Repositories;
 namespace Writing.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230606101059_ver3")]
+    [Migration("20230609071724_ver3")]
     partial class ver3
     {
         /// <inheritdoc />

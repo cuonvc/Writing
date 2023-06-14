@@ -98,7 +98,7 @@ public class PostController : Controller {
     }
     
     
-    [HttpGet("/api/post/vote")]
+    [HttpPost("/api/post/vote")]
     [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> userVotePost(int postId, string voteType)
     {

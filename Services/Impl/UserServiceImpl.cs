@@ -1,14 +1,17 @@
 ﻿using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 using Writing.Configurations;
 using Writing.Entities;
-using Writing.Enumerates;
 using Writing.Handle;
 using Writing.Payloads.Converters;
 using Writing.Payloads.DTOs;
 using Writing.Payloads.Requests;
 using Writing.Payloads.Responses;
 using Writing.Repositories;
+using Role = Writing.Enumerates.Role;
 
 namespace Writing.Services.Impl; 
 
@@ -16,25 +19,54 @@ public class UserServiceImpl : UserService {
 
     private readonly DataContext dataContext;
     private readonly ResponseObject<UserDTO> responseObject;
-    private readonly ResponseObject<string> responseRole;
+    private readonly ResponseObject<string> responseString;
     private readonly ResponseObject<List<UserDTO>> responseList;
     private readonly UserConverter userConverter;
     private readonly IHttpContextAccessor httpContextAccessor;
     private readonly SecurityConfiguration securityConfiguration;
     private readonly FileHandler fileHandler;
+    private readonly IDistributedCache distributedCache;
 
     public UserServiceImpl(DataContext dataContext, ResponseObject<UserDTO> responseObject,
         ResponseObject<List<UserDTO>> responseList, UserConverter userConverter,
-        IHttpContextAccessor httpContextAccessor, ResponseObject<string> responseRole,
-        SecurityConfiguration securityConfiguration, FileHandler fileHandler) {
+        IHttpContextAccessor httpContextAccessor, ResponseObject<string> responseString,
+        SecurityConfiguration securityConfiguration, FileHandler fileHandler,
+        IDistributedCache distributedCache) {
         this.dataContext = dataContext;
         this.responseObject = responseObject;
         this.responseList = responseList;
         this.userConverter = userConverter;
         this.httpContextAccessor = httpContextAccessor;
-        this.responseRole = responseRole;
+        this.responseString = responseString;
         this.securityConfiguration = securityConfiguration;
         this.fileHandler = fileHandler;
+        this.distributedCache = distributedCache;
+    }
+
+    public ResponseObject<string> active(int userId, int activeCode) {
+        User user = dataContext.Users.Where(user => user.Id.Equals(userId)).FirstOrDefault();
+
+        if (user == null) {
+            return responseString.responseError(StatusCodes.Status400BadRequest, 
+                "User not found with ID: " + userId, null);
+        }
+
+        byte[] value = distributedCache.Get(userId.ToString());
+
+        if (value.IsNullOrEmpty()) {
+            return responseString.responseError(StatusCodes.Status400BadRequest,
+                "Key not found", null);
+        }
+        if (!distributedCache.GetString(userId.ToString()).Equals(activeCode.ToString())) {
+            return responseString.responseError(StatusCodes.Status400BadRequest,
+                "Active code đã hết hạn hoặc không đúng", null);
+        }
+
+        user.IsActive = true;
+        dataContext.SaveChanges();
+        distributedCache.Remove(userId.ToString());
+
+        return responseString.responseSuccess("Success", "Kích hoạt tài khoản thành công!");
     }
 
     public ResponseObject<UserDTO> getByEmail(string email) {
@@ -135,12 +167,12 @@ public class UserServiceImpl : UserService {
     public ResponseObject<string> assign(int adminId, int userId) {
         User user = dataContext.Users.Where(user => user.Id.Equals(userId)).FirstOrDefault();
         if (user == null) {
-            return responseRole.responseError(StatusCodes.Status404NotFound,
+            return responseString.responseError(StatusCodes.Status404NotFound,
                 "User not found with id: " + userId, null);
         }
         
         if (user.Id.Equals(adminId)) {
-            return responseRole.responseError(StatusCodes.Status400BadRequest,
+            return responseString.responseError(StatusCodes.Status400BadRequest,
                 "Admin can't assign yourself", null);
         }
 
@@ -149,7 +181,7 @@ public class UserServiceImpl : UserService {
             : Role.USER_ROLE.ToString();
 
         dataContext.SaveChanges();
-        return responseRole.responseSuccess("Assign success", user.Role);
+        return responseString.responseSuccess("Assign success", user.Role);
     }
 
     public ResponseObject<UserDTO> changePassword(int userId, string oldPassword, string newPassword) {

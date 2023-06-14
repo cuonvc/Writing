@@ -17,9 +17,9 @@ public class RelationshipController : Controller {
     }
 
     [HttpPost]
-    [Route("/api/user/follow")]
+    [Route("/api/user/follow/{partnerId}")]
     [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public IActionResult follow([FromHeader] int partnerId, [FromHeader] string action) {
+    public IActionResult follow(int partnerId, string action) {
         int ownerId = Convert.ToInt32(HttpContext.User.FindFirst("Id").Value);
         ResponseObject<Action> responseObject = relationshipService.follow(partnerId, ownerId, action);
 

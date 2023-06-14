@@ -23,6 +23,8 @@ public class Post : BaseEntity {
     
     public bool Pined { get; set; } = false;
 
+    // public bool IsPending { get; set; } = false;
+
     public User User { get; set; }
 
     public List<Category> Categories { get; set; } = new List<Category>();
