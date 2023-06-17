@@ -52,7 +52,7 @@ public class PostServiceImpl : PostService {
             .ToList();
 
         Post postPending = dataContext.Posts
-            .FromSql($"SELECT * FROM Posts_tbl WHERE userId = {userId} AND isActive = 0")
+            .FromSql($"SELECT * FROM Posts_tbl WHERE userId = {userId} AND IsPending = 1")
             .OrderBy(post => post.Id)
             .LastOrDefault();
 
@@ -63,7 +63,7 @@ public class PostServiceImpl : PostService {
             dataContext.Posts.Add(postPending);
         }
         
-        postPending.IsActive = true;
+        postPending.IsPending = false;
         postConverter.requestToEntity(postRequest, postPending);
         postPending.User = user;
         postPending.Categories = categoryList;
@@ -75,12 +75,12 @@ public class PostServiceImpl : PostService {
 
     public ResponseObject<string> cacheThumbnail(int userId, IFormFile file) {
 
-        if (dataContext.Users.Where(user => user.Id == userId && user.IsActive == false).FirstOrDefault() == null) {
+        if (dataContext.Users.Where(user => user.Id.Equals(userId) && user.IsActive == true).FirstOrDefault() == null) {
             return responseString.responseError(StatusCodes.Status400BadRequest, "User chưa active tài khoản", null);
         }
         
         //init post to get ID
-        Post initPost = new Post {Title = "", Content = "", IsActive = false};
+        Post initPost = new Post {Title = "", Content = "", IsPending = true};
         initPost.Categories = new List<Category>();
         initPost.User = dataContext.Users.Where(user => user.Id.Equals(userId)).FirstOrDefault();
         dataContext.Posts.Add(initPost);
@@ -166,7 +166,7 @@ public class PostServiceImpl : PostService {
         }
 
         Post postTemporary = dataContext.Posts
-            .Where(post => post.User.Id.Equals(userId) && post.IsActive == false)
+            .Where(post => post.User.Id.Equals(userId) && post.IsPending == true)
             .OrderBy(post => post.Id)
             .LastOrDefault();  //nullable -> ok
 
@@ -176,6 +176,7 @@ public class PostServiceImpl : PostService {
             dataContext.Posts.Remove(postTemporary);
         }
 
+        postToUpdate.IsPending = false;
         postConverter.requestToEntity(request, postToUpdate);
 
         var updatedCategoryList = categoryIds

@@ -46,10 +46,10 @@ public class UserServiceImpl : UserService {
     public ResponseObject<string> active(int userId, int activeCode) {
         User user = dataContext.Users.Where(user => user.Id.Equals(userId)).FirstOrDefault();
 
-        if (user == null) {
-            return responseString.responseError(StatusCodes.Status400BadRequest, 
-                "User not found with ID: " + userId, null);
-        }
+        // if (user == null) {
+        //     return responseString.responseError(StatusCodes.Status400BadRequest, 
+        //         "User not found with ID: " + userId, null);
+        // }
 
         byte[] value = distributedCache.Get(userId.ToString());
 

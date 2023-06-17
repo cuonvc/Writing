@@ -23,9 +23,11 @@ public class UserController : Controller {
     }
 
     [HttpPost]
-    [Route("/api/user/active/{userId}")]
+    [Route("/api/user/active")]
+    [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public IActionResult activeAccount(int userId, int activeCode) {
-        ResponseObject<string> responseObject = userService.active(userId, activeCode);
+        int id = Convert.ToInt32(HttpContext.User.FindFirst("Id").Value);
+        ResponseObject<string> responseObject = userService.active(id, activeCode);
         if (responseObject.Data == null) {
             return NotFound(responseObject);
         }
