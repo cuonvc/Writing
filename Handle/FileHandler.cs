@@ -7,7 +7,8 @@ public class FileHandler {
         string currentDir = Directory.GetCurrentDirectory();
         string relativePath = Path.Combine($"\\resource\\images\\{dir}", id.ToString(), newFileName);
         Directory.CreateDirectory(Path.Combine($"resource/images/{dir}", id.ToString()));  //create directory if not existed
-        string absolutePath = Path.ChangeExtension(currentDir + relativePath, "png").Replace(".jpg", ".png");
+        string absolutePath = Path.ChangeExtension(currentDir + relativePath, "png").Replace(".jpg", ".png")
+            .Replace(".jpeg", "png");
         foreach (var f in Directory.GetFiles(currentDir + $"/resource/images/{dir}/" + id.ToString())) {
             File.Delete(f);
         }

@@ -197,7 +197,7 @@ public class PostServiceImpl : PostService {
         List<PostDTO> postDTOs = dataContext.Posts
             .Include(x => x.User)
             .Include(x => x.Categories)
-            .Where(x => x.Title.Trim().ToLower().Contains(name.ToLower().Trim()) && x.IsActive == true)
+            .Where(x => x.Title.Trim().ToLower().Contains(name.ToLower().Trim()) && x.IsActive == true && x.IsPending == false)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .OrderByDescending(post => post.CreatedDate)
@@ -210,7 +210,7 @@ public class PostServiceImpl : PostService {
         List<PostDTO> postDTOs = dataContext.Posts
             .Include(x => x.User)
             .Include(x => x.Categories)
-            .Where(post => post.IsActive == true)
+            .Where(post => post.IsActive == true && post.IsPending == false)
             .OrderByDescending(post => post.CreatedDate)
             .Skip((pageNum - 1) * pageSize)
             .Take(pageSize)
