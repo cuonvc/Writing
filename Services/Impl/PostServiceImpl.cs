@@ -102,6 +102,7 @@ public class PostServiceImpl : PostService {
             .Include(entity => entity.Categories)
             .Where(post => post.Id.Equals(id) && post.IsActive == true)
             .FirstOrDefault();
+        //select * from post where id = "100"
 
         if (post == null) {
             return responseObject.responseError(StatusCodes.Status404NotFound,

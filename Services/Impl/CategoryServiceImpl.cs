@@ -26,7 +26,7 @@ public class CategoryServiceImpl : CategoryService {
     
     public ResponseObject<CategoryDTO> create(CategoryRequest request) {
         Category category = dataContext.Categories.Where(category => category.Name.Equals(request.Name))
-            .FirstOrDefault();
+            .FirstOrDefault(); 
         if (category != null) {
             return responseObject.responseError(StatusCodes.Status400BadRequest, 
                 "Category already existed", null);

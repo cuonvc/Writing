@@ -1,0 +1,6 @@
+Blog-app-frontend: Giao diện - client - frontend sẽ call API
+Writing: Backend - server sẽ trả ra API
+Database: Thư mục chứa file sql của dự án(có thể tạo mới trong file hướng dẫn)
+Redis: Thư mục Redis server, phục vụ cho việc gửi email xác nhận khi đăn ký tài khoản
+
+Link source code kèm theo lịch sử commit trong quá trình phát triển dự án - trong file hướng dẫn đi kèm
