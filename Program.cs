@@ -50,6 +50,7 @@ builder.Services.AddSingleton<ResponseData<ActionStatus>>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<ResponseObject<ResponseTokenObject>>();
 builder.Services.AddTransient<AuthService, AuthServiceImpl>();
+builder.Services.AddTransient<OAuthService, OAuthServiceImpl>();
 builder.Services.AddTransient<RefreshTokenService, RefreshTokenImpl>();
 builder.Services.AddTransient<UserService, UserServiceImpl>();
 builder.Services.AddTransient<SendEmailService, SendEmailServiceImpl>();

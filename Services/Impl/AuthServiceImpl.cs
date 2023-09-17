@@ -132,7 +132,7 @@ public class AuthServiceImpl : AuthService {
         });
     }
 
-    private string generateAccessToken(User user) {
+    public string generateAccessToken(User user) {
         List<Claim> claims = new List<Claim> {
             new Claim("Id", user.Id.ToString()),
             new Claim("Email", user.Email),

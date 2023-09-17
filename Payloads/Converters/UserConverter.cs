@@ -31,6 +31,11 @@ public class UserConverter {
     public UserDTO entityToDto(User entity) {
         HttpContext context = httpContextAccessor.HttpContext;
         string baseUrl = $"{context.Request.Scheme}://{context.Request.Host}/image/";
+
+        if (!entity.AvatarPhoto.Contains("https")) {
+            entity.AvatarPhoto = baseUrl + entity.AvatarPhoto; // http://localhost:8080/...
+        }
+
         return new UserDTO {
             Id = entity.Id,
             FirstName = entity.FirstName,
@@ -40,7 +45,7 @@ public class UserConverter {
             Gender = entity.Gender,
             Role = entity.Role,
             DateOfBirth = entity.DateOfBirth,
-            AvatarPhoto = baseUrl + entity.AvatarPhoto, //http://localhost:8080/...
+            AvatarPhoto = entity.AvatarPhoto,
             CoverPhoto = baseUrl + entity.CoverPhoto,
             CreatedDate = entity.CreatedDate,
             CreatedBy = entity.CreatedBy,

@@ -1,4 +1,5 @@
-﻿using Writing.Payloads.DTOs;
+﻿using Writing.Entities;
+using Writing.Payloads.DTOs;
 using Writing.Payloads.Requests;
 using Writing.Payloads.Responses;
 
@@ -10,4 +11,6 @@ public interface AuthService {
     ResponseObject<ResponseTokenObject> login(LoginRequest request);
 
     ResponseObject<ResponseTokenObject> renewAccessToken(TokenObjectRequest request);
+
+    string generateAccessToken(User user);
 }
